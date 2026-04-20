@@ -12,7 +12,7 @@ export function Hero({ onOpenQuiz }: HeroProps) {
       <img
         src={IMAGES.hero}
         alt="Training My Humble"
-        className="absolute inset-0 h-full w-full scale-[1.1] object-cover object-[62%_38%] opacity-40 md:object-[68%_36%]"
+        className="absolute inset-0 h-full w-full scale-[1.06] object-cover object-[68%_34%] opacity-40 sm:scale-[1.08] md:scale-[1.1] md:object-[68%_36%]"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20" />
       <motion.div
@@ -20,13 +20,13 @@ export function Hero({ onOpenQuiz }: HeroProps) {
         transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
         className="absolute -right-24 top-16 h-72 w-72 rounded-full bg-[#2872fa]/20 blur-3xl"
       />
-      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-center px-6 pb-16 pt-32 md:px-10 md:pb-20 md:pt-36 lg:px-16 lg:pb-24 lg:pt-40">
+      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-center px-5 pb-12 pt-28 sm:px-6 sm:pb-16 sm:pt-32 md:px-10 md:pb-20 md:pt-36 lg:px-16 lg:pb-24 lg:pt-40">
         <div className="max-w-4xl">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="pr-2 text-xs font-semibold uppercase tracking-[0.38em] text-[#2872fa] sm:text-sm sm:tracking-[0.45em]"
+            className="max-w-[19rem] pr-2 text-[10px] font-semibold uppercase leading-6 tracking-[0.3em] text-[#2872fa] sm:max-w-none sm:text-sm sm:tracking-[0.45em]"
           >
             Unleash your inner champion
           </motion.p>
@@ -34,7 +34,7 @@ export function Hero({ onOpenQuiz }: HeroProps) {
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="mt-6 text-5xl font-black uppercase leading-[0.92] tracking-tight sm:text-6xl lg:text-8xl"
+            className="mt-5 max-w-[12rem] text-[2.85rem] font-black uppercase leading-[0.9] tracking-tight sm:mt-6 sm:max-w-none sm:text-6xl lg:text-8xl"
           >
             Become
             <br />
@@ -46,7 +46,7 @@ export function Hero({ onOpenQuiz }: HeroProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="mt-6 max-w-2xl text-base leading-8 text-white/75 sm:text-lg"
+            className="mt-5 max-w-[21rem] text-[15px] leading-7 text-white/75 sm:mt-6 sm:max-w-2xl sm:text-lg sm:leading-8"
           >
             My Humble is gebouwd voor mensen die meer willen dan alleen trainen. Dit is waar discipline, kracht en
             karakter samenkomen in een aanpak die je helpt om sterker te leven.
@@ -55,15 +55,15 @@ export function Hero({ onOpenQuiz }: HeroProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="mt-10 flex w-full max-w-2xl flex-col gap-4 sm:flex-row"
+            className="mt-8 flex w-full max-w-md flex-col gap-3 sm:mt-10 sm:max-w-2xl sm:flex-row sm:gap-4"
           >
-            <button type="button" onClick={onOpenQuiz} className={cn(primaryButtonClass, 'sm:min-w-[240px]')}>
+            <button type="button" onClick={onOpenQuiz} className={cn(primaryButtonClass, 'w-full px-5 py-3.5 text-[11px] sm:min-w-[240px] sm:px-7 sm:py-4 sm:text-sm')}>
               Claim je plek nu
             </button>
             <a
               href="#waarom"
               className={cn(
-                'inline-flex items-center justify-center rounded-full border border-white/20 px-8 py-4 text-sm font-black uppercase tracking-[0.25em] text-white transition hover:bg-white hover:text-black sm:min-w-[220px]',
+                'inline-flex w-full items-center justify-center rounded-full border border-white/20 px-5 py-3.5 text-[11px] font-black uppercase tracking-[0.2em] text-white transition hover:bg-white hover:text-black sm:min-w-[220px] sm:px-8 sm:py-4 sm:text-sm sm:tracking-[0.25em]',
               )}
             >
               Ontdek meer

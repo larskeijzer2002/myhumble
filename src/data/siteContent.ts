@@ -287,19 +287,21 @@ export const packages: PackagePlan[] = [
     tag: 'Nieuw programma',
     image: IMAGES.program,
     description:
-      'Een nieuw coachingstraject voor mensen die serieus fitter en sterker willen worden met een praktische aanpak die overal te volgen is en direct uitvoerbaar voelt.',
+      'Een nieuw coachingstraject voor mensen die fitter en sterker willen worden, maar vastlopen op tijd, structuur, motivatie en zichtbare resultaten.',
     forWho:
-      'Voor mensen die willen werken aan hun lichaam en conditie, maar niet afhankelijk willen zijn van een sportschool, weinig tijd hebben of liever trainen zonder drukte en afleiding.',
+      'Voor mensen die willen werken aan hun lichaam en conditie, maar merken dat gebrek aan tijd, structuur, motivatie of resultaat hen steeds opnieuw tegenhoudt.',
     includes: [
       'Kant-en-klare video workouts in de app die je direct kunt volgen',
       'Trainingen van maximaal 45 minuten die passen in een druk leven',
+      'Een praktische aanpak die helpt om meer structuur en ritme op te bouwen',
+      'Gerichte ondersteuning om motivatie vast te houden en resultaat zichtbaar te maken',
       'Direct contact met je trainer voor vragen, feedback en begeleiding',
       'Voeding bijhouden en inzicht krijgen via de app',
     ],
     outcome:
-      'Je maakt sporten haalbaar, consistent en resultaatgericht, zodat je ook met een volle agenda kunt bouwen aan een fitter, sterker en energieker lichaam.',
+      'Je maakt sporten haalbaar, overzichtelijk en resultaatgericht, zodat je ook met een volle agenda kunt bouwen aan een fitter, sterker en energieker lichaam.',
     story:
-      'Binnen My Humble Program werk je zelfstandig onder gerichte begeleiding aan het behalen van je fysieke doelen, zonder afhankelijk te zijn van tijd, locatie of drukte in een sportschool. Via de app krijg je direct toegang tot kant-en-klare video trainingen die overal te volgen zijn en bewust zijn opgebouwd om praktisch, overzichtelijk en effectief te blijven. Met sessies van maximaal 45 minuten wordt sporten ook haalbaar wanneer je agenda vol zit, terwijl je tegelijk verbonden blijft met jouw trainer voor vragen, begeleiding en extra scherpte. In dezelfde app kun je jouw voeding eenvoudig bijhouden en daar meer inzicht in krijgen. Dit traject is nieuw binnen My Humble en gemaakt voor mensen die resultaat willen boeken met een aanpak die echt past binnen het dagelijks leven.',
+      'Binnen My Humble Program werk je zelfstandig onder gerichte begeleiding aan je fysieke doelen met een aanpak die juist is ontwikkeld voor mensen die vastlopen op tijd, structuur, motivatie en zichtbare resultaten. Via de app krijg je direct toegang tot kant-en-klare video trainingen die overal te volgen zijn en bewust zijn opgebouwd om praktisch, overzichtelijk en effectief te blijven. Met sessies van maximaal 45 minuten wordt sporten haalbaar binnen een druk leven, terwijl je tegelijk werkt aan meer ritme, meer discipline en meer grip op je voortgang. In dezelfde app kun je jouw voeding eenvoudig bijhouden, inzicht krijgen in wat je doet en contact houden met jouw trainer voor vragen, feedback en extra scherpte. Dit traject is nieuw binnen My Humble en gemaakt om precies die drempels aan te pakken die mensen normaal tegenhouden om echt consistent resultaat te boeken.',
     isNew: true,
   },
 ];

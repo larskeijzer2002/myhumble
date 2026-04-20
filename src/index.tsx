@@ -26,7 +26,7 @@ function Reveal({ children, delay = 0 }: { children: ReactNode; delay?: number }
 
 function BenefitSection() {
   return (
-    <section id="waarom" className="mx-auto max-w-7xl px-6 py-20 md:px-10 lg:px-16">
+    <section id="waarom" className="mx-auto max-w-7xl px-5 py-16 sm:px-6 sm:py-20 md:px-10 lg:px-16">
       <SectionHeader eyebrow="Waarom My Humble" title="Gebouwd voor mensen die sterker willen leven, niet alleen trainen." />
       <div className="grid gap-6 lg:grid-cols-3">
         {benefits.map((benefit, index) => (
@@ -54,7 +54,7 @@ function BenefitSection() {
 function PillarSection() {
   return (
     <section className="border-y border-white/10 bg-white/[0.03]">
-      <div className="mx-auto max-w-7xl px-6 py-20 md:px-10 lg:px-16">
+      <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 sm:py-20 md:px-10 lg:px-16">
         <SectionHeader
           eyebrow="De basis"
           title="Drie pijlers waarop My Humble staat."
@@ -62,7 +62,7 @@ function PillarSection() {
         />
         <div className="grid gap-6 lg:grid-cols-3">
           {pillars.map((pillar) => (
-            <div key={pillar.number} className="rounded-[2rem] border border-white/10 bg-black/50 p-8">
+            <div key={pillar.number} className="rounded-[2rem] border border-white/10 bg-black/50 p-7 sm:p-8">
               <p className="text-sm font-black uppercase tracking-[0.28em] text-[#2872fa]">{pillar.number}</p>
               <h3 className="mt-5 text-3xl font-black uppercase">{pillar.title}</h3>
               <p className="mt-4 text-base leading-8 text-white/68">{pillar.text}</p>
@@ -77,17 +77,17 @@ function PillarSection() {
 function AboutSection() {
   return (
     <section id="over" className="border-y border-white/10 bg-white/[0.03]">
-      <div className="mx-auto grid max-w-7xl gap-8 px-6 py-20 md:px-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch lg:px-16">
+      <div className="mx-auto grid max-w-7xl gap-6 px-5 py-16 sm:gap-8 sm:px-6 sm:py-20 md:px-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch lg:px-16">
         <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-black/50">
           <img
             src={IMAGES.about}
             alt="Lars Keijzer training"
-            className="h-[420px] w-full object-cover object-center sm:h-[560px] lg:h-full"
+            className="h-[300px] w-full object-cover object-center sm:h-[560px] lg:h-full"
           />
         </div>
-        <div className="rounded-[2rem] border border-white/10 bg-black/50 p-8 text-base leading-8 text-white/75 sm:p-10">
-          <p className="text-sm font-semibold uppercase tracking-[0.4em] text-[#2872fa]">Over My Humble</p>
-          <h2 className="mt-4 text-3xl font-black uppercase leading-tight sm:text-5xl">Meer dan een sportmerk.</h2>
+        <div className="rounded-[2rem] border border-white/10 bg-black/50 p-6 text-[15px] leading-7 text-white/75 sm:p-10 sm:text-base sm:leading-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#2872fa] sm:text-sm sm:tracking-[0.4em]">Over My Humble</p>
+          <h2 className="mt-3 text-[2rem] font-black uppercase leading-[1.02] sm:mt-4 sm:text-5xl sm:leading-tight">Meer dan een sportmerk.</h2>
           <p className="mt-8">Ik ben Lars Keijzer, oprichter van My Humble.</p>
           <p className="mt-6">Van mijn achtste tot mijn achttiende kampte ik met overgewicht. Op mijn zwaarste punt zat ik ongeveer 40 kilo boven een gezond gewicht.</p>
           <p className="mt-6">Tijdens de coronaperiode besloot ik het anders te doen. Geen excuses meer. In acht maanden tijd heb ik ervaren wat discipline, structuur en sport écht kunnen betekenen.</p>
@@ -101,12 +101,12 @@ function AboutSection() {
 
 function ReviewsSection() {
   return (
-    <section id="reviews" className="mx-auto max-w-7xl px-6 py-20 md:px-10 lg:px-16">
+    <section id="reviews" className="mx-auto max-w-7xl px-5 py-16 sm:px-6 sm:py-20 md:px-10 lg:px-16">
       <SectionHeader eyebrow="Reviews" title="Wat mensen ervaren wanneer ze instappen." />
       <div className="grid gap-6 lg:grid-cols-3">
         {testimonials.map((item, index) => (
           <Reveal key={item.name} delay={index * 0.08}>
-            <div className="group relative flex h-full flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-white/[0.06] via-black/70 to-black p-7 transition duration-300 hover:-translate-y-1 hover:border-[#2872fa]/50 hover:shadow-[0_18px_50px_rgba(40,114,250,0.12)]">
+            <div className="group relative flex h-full flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-white/[0.06] via-black/70 to-black p-6 sm:p-7 transition duration-300 hover:-translate-y-1 hover:border-[#2872fa]/50 hover:shadow-[0_18px_50px_rgba(40,114,250,0.12)]">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(40,114,250,0.14),_transparent_32%)] opacity-80" />
               <div className="relative mb-6 flex items-center justify-between">
                 <div className="text-6xl font-black leading-none text-[#2872fa]">“</div>
@@ -115,7 +115,7 @@ function ReviewsSection() {
                 </div>
               </div>
               <div className="relative flex h-full flex-col">
-                <p className="text-lg leading-8 text-white/82">{item.quote}</p>
+                <p className="text-base leading-7 text-white/82 sm:text-lg sm:leading-8">{item.quote}</p>
                 <div className="mt-8 h-px w-full bg-gradient-to-r from-[#2872fa]/50 via-white/10 to-transparent" />
                 <div className="mt-auto pt-5">
                   <p className="text-sm font-black uppercase tracking-[0.18em] text-white">{item.name}</p>
@@ -145,18 +145,18 @@ function FaqSection() {
 
   return (
     <section id="faq" className="border-y border-white/10 bg-white/[0.03]">
-      <div className="mx-auto max-w-7xl px-6 py-20 md:px-10 lg:px-16">
+      <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 sm:py-20 md:px-10 lg:px-16">
         <SectionHeader eyebrow="FAQ" title="Helder voordat je jouw volgende stap zet." />
-        <div className="rounded-[2rem] border border-white/10 bg-black/50 p-6 sm:p-8 lg:p-10">
+        <div className="rounded-[2rem] border border-white/10 bg-black/50 p-5 sm:p-8 lg:p-10">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-              <p className="text-[11px] font-black uppercase tracking-[0.24em] text-[#2872fa]">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#2872fa] sm:text-[11px] sm:tracking-[0.24em]">
                 Vraag {activeFaq + 1} / {faqs.length}
               </p>
-              <h3 className="mt-4 text-3xl font-black uppercase leading-tight sm:text-4xl">
+              <h3 className="mt-3 text-[1.75rem] font-black uppercase leading-[1.05] sm:mt-4 sm:text-4xl sm:leading-tight">
                 {currentItem.question}
               </h3>
-              <p className="mt-5 max-w-2xl text-base leading-8 text-white/72 sm:text-lg">
+              <p className="mt-4 max-w-2xl text-[15px] leading-7 text-white/72 sm:mt-5 sm:text-lg sm:leading-8">
                 {currentItem.answer}
               </p>
             </div>
@@ -181,14 +181,14 @@ function FaqSection() {
             </div>
           </div>
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="scrollbar-none mt-8 flex gap-3 overflow-x-auto pb-1">
             {faqs.map((item, index) => (
               <button
                 key={item.question}
                 type="button"
                 onClick={() => setActiveFaq(index)}
                 className={cn(
-                  'rounded-full border px-4 py-3 text-[11px] font-black uppercase tracking-[0.16em] transition',
+                  'shrink-0 rounded-full border px-4 py-3 text-[10px] font-black uppercase tracking-[0.14em] transition sm:text-[11px] sm:tracking-[0.16em]',
                   activeFaq === index
                     ? 'border-[#2872fa] bg-[#2872fa] text-white'
                     : 'border-white/10 bg-white/[0.03] text-white/60 hover:border-white/25 hover:text-white',
@@ -206,13 +206,13 @@ function FaqSection() {
 
 function CtaSection({ onOpenQuiz }: { onOpenQuiz: () => void }) {
   return (
-    <section className="mx-auto max-w-7xl px-6 py-20 md:px-10 lg:px-16">
-      <div className="overflow-hidden rounded-[2.5rem] border border-white/10 bg-gradient-to-br from-[#2872fa]/20 via-black to-black">
+    <section className="mx-auto max-w-7xl px-5 py-16 sm:px-6 sm:py-20 md:px-10 lg:px-16">
+      <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#2872fa]/20 via-black to-black sm:rounded-[2.5rem]">
         <div className="grid lg:grid-cols-[1fr_0.9fr] lg:items-stretch">
-          <div className="p-8 sm:p-12 lg:p-16">
-            <p className="text-sm font-semibold uppercase tracking-[0.4em] text-white/60">Start jouw intake</p>
-            <h2 className="mt-4 text-3xl font-black uppercase leading-tight sm:text-5xl">Klaar om sterker te leven?</h2>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-white/72">
+          <div className="p-6 sm:p-12 lg:p-16">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60 sm:text-sm sm:tracking-[0.4em]">Start jouw intake</p>
+            <h2 className="mt-3 text-[2rem] font-black uppercase leading-[1.02] sm:mt-4 sm:text-5xl sm:leading-tight">Klaar om sterker te leven?</h2>
+            <p className="mt-4 max-w-2xl text-[15px] leading-7 text-white/72 sm:mt-5 sm:text-base">
               Zet vandaag de eerste stap en ontdek welk traject past bij jouw doel, jouw ritme en de manier waarop jij wilt groeien.
             </p>
             <button
@@ -220,13 +220,13 @@ function CtaSection({ onOpenQuiz }: { onOpenQuiz: () => void }) {
               onClick={onOpenQuiz}
               className={cn(
                 primaryButtonClass,
-                'mt-8 px-5 py-3 text-[11px] shadow-[0_0_30px_rgba(40,114,250,0.22)] sm:px-7 sm:py-4 sm:text-sm',
+                'mt-7 w-full px-5 py-3 text-[11px] shadow-[0_0_30px_rgba(40,114,250,0.22)] sm:mt-8 sm:w-auto sm:px-7 sm:py-4 sm:text-sm',
               )}
             >
               Train met My Humble
             </button>
           </div>
-          <div className="relative min-h-[320px] overflow-hidden">
+          <div className="relative min-h-[240px] overflow-hidden sm:min-h-[320px]">
             <motion.img whileHover={{ scale: 1.04 }} transition={{ duration: 0.6 }} src={IMAGES.discipline} alt="My Humble training call to action" className="h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-l from-black/10 via-black/20 to-black/60" />
           </div>

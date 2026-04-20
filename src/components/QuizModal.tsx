@@ -97,12 +97,12 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
 
     return (
       <div className="space-y-6">
-        <button type="button" onClick={onBack} className={ghostButtonClass}>
+        <button type="button" onClick={onBack} className={cn(ghostButtonClass, 'w-full px-5 py-3 text-[11px] sm:w-auto sm:px-7 sm:py-4 sm:text-sm')}>
           Terug naar pakketten
         </button>
-        <div className="rounded-[1.9rem] border border-white/10 bg-white/[0.03] p-6 sm:p-8 lg:p-10">
+        <div className="rounded-[1.9rem] border border-white/10 bg-white/[0.03] p-5 sm:p-8 lg:p-10">
           <div className="relative mb-8 overflow-hidden rounded-[1.6rem] border border-white/10">
-            <img src={activePackage.image} alt={activePackage.title} className="h-72 w-full object-cover sm:h-80 lg:h-[26rem]" />
+            <img src={activePackage.image} alt={activePackage.title} className="h-56 w-full object-cover sm:h-80 lg:h-[26rem]" />
             {activePackage.isNew ? (
               <div className="absolute right-5 top-5 inline-flex items-center gap-2 rounded-full border border-[#2872fa]/35 bg-black/65 px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.24em] text-white shadow-[0_0_30px_rgba(40,114,250,0.24)] backdrop-blur-md">
                 <span className="relative flex h-2.5 w-2.5">
@@ -116,18 +116,18 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
           <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:gap-10">
             <div>
               <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#2872fa]">Traject informatie</p>
-              <h3 className="mt-4 text-4xl font-black uppercase leading-tight sm:text-5xl">{activePackage.title}</h3>
+              <h3 className="mt-4 text-[2rem] font-black uppercase leading-[1.02] sm:text-5xl sm:leading-tight">{activePackage.title}</h3>
               <p className="mt-3 text-xs font-black uppercase tracking-[0.2em] text-white/45">{activePackage.tag}</p>
-              <p className="mt-6 max-w-2xl text-lg leading-9 text-white/80 lg:text-[1.15rem] lg:leading-10">{activePackage.description}</p>
+              <p className="mt-5 max-w-2xl text-base leading-8 text-white/80 sm:mt-6 sm:text-lg sm:leading-9 lg:text-[1.15rem] lg:leading-10">{activePackage.description}</p>
 
-              <div className="mt-8 flex flex-wrap gap-3">
+              <div className="scrollbar-none mt-8 flex gap-3 overflow-x-auto pb-1">
                 {sectionTabs.map((tab) => (
                 <button
                   key={tab.key}
                   type="button"
                     onClick={() => setActiveSection(tab.key)}
                     className={cn(
-                      'rounded-full border px-4 py-3 text-[11px] font-black uppercase tracking-[0.18em] transition',
+                      'shrink-0 rounded-full border px-4 py-3 text-[10px] font-black uppercase tracking-[0.14em] transition sm:text-[11px] sm:tracking-[0.18em]',
                       activeSection === tab.key
                         ? 'border-[#2872fa] bg-[#2872fa] text-white'
                         : 'border-white/10 bg-black/50 text-white/65 hover:border-white/25 hover:text-white',
@@ -178,12 +178,12 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
             </div>
 
             <div className="space-y-6">
-              <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-[#2872fa]/14 via-black to-black p-7">
+              <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-[#2872fa]/14 via-black to-black p-6 sm:p-7">
                 <p className="text-[11px] font-black uppercase tracking-[0.22em] text-white/50">Wat dit oplevert</p>
                 <p className="mt-4 text-base leading-8 text-white/80">{activePackage.outcome}</p>
               </div>
 
-              <div className="rounded-[1.5rem] border border-white/10 bg-black/55 p-7">
+              <div className="rounded-[1.5rem] border border-white/10 bg-black/55 p-6 sm:p-7">
                 <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#2872fa]">Na je aankoop</p>
                 <p className="mt-4 text-sm leading-7 text-white/72">
                   Na je aankoop neemt een trainer van My Humble contact met je op om jouw traject op te starten en de
@@ -191,10 +191,10 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
                 </p>
               </div>
 
-              <div className="rounded-[1.5rem] border border-white/10 bg-black/60 p-7">
-                <div className="rounded-[1.25rem] border border-[#2872fa]/20 bg-gradient-to-br from-[#2872fa]/18 via-[#0b1220] to-black p-5">
+              <div className="rounded-[1.5rem] border border-white/10 bg-black/60 p-6 sm:p-7">
+                <div className="rounded-[1.25rem] border border-[#2872fa]/20 bg-gradient-to-br from-[#2872fa]/18 via-[#0b1220] to-black p-4 sm:p-5">
                   <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#2872fa]">Direct starten</p>
-                  <h4 className="mt-3 text-2xl font-black uppercase leading-tight text-white">
+                  <h4 className="mt-3 text-xl font-black uppercase leading-tight text-white sm:text-2xl">
                     Klaar om dit traject te claimen?
                   </h4>
                   <p className="mt-4 text-sm leading-7 text-white/72">
@@ -223,7 +223,7 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
                       });
                       void onSelectPackage(activePackage.key, answers, selectedTrainingFrequency ?? undefined);
                     }}
-                    className={primaryButtonClass}
+                    className={cn(primaryButtonClass, 'w-full px-5 py-3 text-[11px] sm:px-7 sm:py-4 sm:text-sm')}
                   >
                     Kies dit pakket
                   </button>
@@ -232,7 +232,7 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
                       {trainingSelectionError}
                     </p>
                   ) : null}
-                  <button type="button" onClick={onBack} className={ghostButtonClass}>
+                  <button type="button" onClick={onBack} className={cn(ghostButtonClass, 'w-full px-5 py-3 text-[11px] sm:px-7 sm:py-4 sm:text-sm')}>
                     Bekijk andere pakketten
                   </button>
                 </div>
@@ -281,7 +281,7 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
                   trackEvent('checkout_clicked', { package_name: pkg.key });
                   void onSelectPackage(pkg.key, answers);
                 }}
-                className={cn(primaryButtonClass, 'shrink-0')}
+                className={cn(primaryButtonClass, 'w-full shrink-0 px-5 py-3 text-[11px] sm:w-auto sm:px-7 sm:py-4 sm:text-sm')}
               >
                 {pkg.key === 'training' ? 'Kies jouw ritme' : 'Kies dit pakket'}
               </button>
@@ -417,8 +417,8 @@ export function QuizModal({ isOpen, steps, onClose, onSubmitLead, onSelectPackag
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 py-6 backdrop-blur-sm">
-      <div className="relative max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-[2rem] border border-white/10 bg-[#050505] p-6 shadow-2xl sm:p-8 lg:p-10">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-3 py-3 backdrop-blur-sm sm:px-4 sm:py-6">
+      <div className="relative max-h-[96vh] w-full max-w-5xl overflow-y-auto rounded-[1.75rem] border border-white/10 bg-[#050505] p-5 shadow-2xl sm:max-h-[92vh] sm:rounded-[2rem] sm:p-8 lg:p-10">
         <button
           type="button"
           onClick={onClose}
@@ -427,15 +427,15 @@ export function QuizModal({ isOpen, steps, onClose, onSubmitLead, onSelectPackag
           ×
         </button>
 
-        <div className="mb-6 flex items-center justify-between gap-4 border-b border-white/10 pb-6">
-          <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-white/45">{showPackages ? 'Kies jouw pakket' : currentStep?.eyebrow}</p>
-            <h2 className="mt-2 text-2xl font-black uppercase leading-tight">
+        <div className="mb-6 flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="pr-10 sm:pr-0">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs sm:tracking-[0.3em]">{showPackages ? 'Kies jouw pakket' : currentStep?.eyebrow}</p>
+            <h2 className="mt-2 text-[1.75rem] font-black uppercase leading-[1.05] sm:text-2xl sm:leading-tight">
               {showPackages ? 'Welke My Humble route past bij jou?' : currentStep?.title}
             </h2>
           </div>
           {!showPackages ? (
-            <span className="shrink-0 rounded-full border border-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.22em] text-white/60">
+            <span className="w-fit shrink-0 rounded-full border border-white/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-white/60 sm:text-xs sm:tracking-[0.22em]">
               Stap {step + 1} / {steps.length}
             </span>
           ) : null}

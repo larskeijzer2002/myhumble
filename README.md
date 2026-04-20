@@ -16,6 +16,20 @@ pnpm build
 pnpm preview
 ```
 
+## 1 klik publiceren
+
+Gebruik hiervoor:
+
+- [Publish My Humble.command](/Users/larskeijzer/Documents/Codex/2026-04-17-kan-je-hier-verder-werken-aan/Publish%20My%20Humble.command)
+
+Dubbelklik op dit bestand in Finder. Dan gebeurt automatisch:
+
+1. Een buildcontrole
+2. `git add`
+3. Een commit met tijdstempel
+4. Een push naar GitHub
+5. Daarna pakt Vercel de nieuwe versie automatisch op
+
 ## Live zetten via Vercel
 
 1. Maak een GitHub repository aan.
