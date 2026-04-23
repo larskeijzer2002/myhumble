@@ -53,7 +53,7 @@ export function Footer({ onOpenQuiz, onOpenPrivacy }: FooterProps) {
               </div>
             </div>
             <p className="mt-5 text-[15px] leading-7 text-white/62 sm:mt-6 sm:text-base sm:leading-8">
-              Fitness coaching voor mensen die sterker willen worden in fysiek, discipline en dagelijkse routine.
+              Fitness coaching voor mensen die fitter willen worden, meer structuur willen opbouwen en zich beter willen voelen in het dagelijks leven.
             </p>
             <button
               type="button"
@@ -95,7 +95,7 @@ export function Footer({ onOpenQuiz, onOpenPrivacy }: FooterProps) {
               <p className="uppercase tracking-[0.18em] text-white/45">Nederland</p>
               <p className="text-white/60">Burgemeester Molenbroekstraat, Delfgauw</p>
               <p className="leading-7 text-white/55">
-                Klaar om de volgende stap te zetten? Doorloop de intake en ontdek welk traject het best past bij jouw doel en ritme.
+                Klaar om te beginnen? Doorloop de intake en kijk welk pakket het beste past bij jouw doel en jouw week.
               </p>
             </div>
           </div>

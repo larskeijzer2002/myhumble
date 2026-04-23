@@ -58,7 +58,7 @@ function PillarSection() {
         <SectionHeader
           eyebrow="De basis"
           title="Drie pijlers waarop My Humble staat."
-          description="My Humble draait niet alleen om trainen, maar om het bouwen van discipline, kracht en een standaard die je elke dag met je meedraagt."
+          description="My Humble gaat niet alleen over trainen. Het gaat over structuur, kracht en afspraken met jezelf nakomen."
         />
         <div className="grid gap-6 lg:grid-cols-3">
           {pillars.map((pillar) => (
@@ -91,8 +91,8 @@ function AboutSection() {
           <p className="mt-8">Ik ben Lars Keijzer, oprichter van My Humble.</p>
           <p className="mt-6">Van mijn achtste tot mijn achttiende kampte ik met overgewicht. Op mijn zwaarste punt zat ik ongeveer 40 kilo boven een gezond gewicht.</p>
           <p className="mt-6">Tijdens de coronaperiode besloot ik het anders te doen. Geen excuses meer. In acht maanden tijd heb ik ervaren wat discipline, structuur en sport écht kunnen betekenen.</p>
-          <p className="mt-6">Na mijn terugkeer in Nederland ontstond My Humble. Vanuit de overtuiging dat iedereen in staat is om een blijvende verandering te maken.</p>
-          <p className="mt-6">Mijn doel is simpel: jou helpen om sterker, fitter en zelfverzekerder te worden — op een manier die je volhoudt.</p>
+          <p className="mt-6">Na mijn terugkeer in Nederland ontstond My Humble. Vanuit het geloof dat echte verandering voor iedereen mogelijk is, als je het op de juiste manier aanpakt.</p>
+          <p className="mt-6">Mijn doel is simpel: jou helpen om sterker, fitter en zelfverzekerder te worden op een manier die je ook echt volhoudt.</p>
         </div>
       </div>
     </section>
@@ -132,12 +132,15 @@ function ReviewsSection() {
 
 function FaqSection() {
   const [activeFaq, setActiveFaq] = useState(0);
+  const [direction, setDirection] = useState(1);
 
   const previousFaq = () => {
+    setDirection(-1);
     setActiveFaq((current) => (current === 0 ? faqs.length - 1 : current - 1));
   };
 
   const nextFaq = () => {
+    setDirection(1);
     setActiveFaq((current) => (current === faqs.length - 1 ? 0 : current + 1));
   };
 
@@ -148,20 +151,15 @@ function FaqSection() {
       <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 sm:py-20 md:px-10 lg:px-16">
         <SectionHeader eyebrow="FAQ" title="Helder voordat je jouw volgende stap zet." />
         <div className="rounded-[2rem] border border-white/10 bg-black/50 p-5 sm:p-8 lg:p-10">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-3xl">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#2872fa] sm:text-[11px] sm:tracking-[0.24em]">
+          <div className="flex flex-col gap-5 sm:gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="flex items-center gap-3">
+              <div className="rounded-full border border-[#2872fa]/20 bg-[#2872fa]/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#2872fa] sm:text-[11px] sm:tracking-[0.24em]">
                 Vraag {activeFaq + 1} / {faqs.length}
-              </p>
-              <h3 className="mt-3 text-[1.75rem] font-black uppercase leading-[1.05] sm:mt-4 sm:text-4xl sm:leading-tight">
-                {currentItem.question}
-              </h3>
-              <p className="mt-4 max-w-2xl text-[15px] leading-7 text-white/72 sm:mt-5 sm:text-lg sm:leading-8">
-                {currentItem.answer}
-              </p>
+              </div>
+              <div className="hidden h-px w-16 bg-gradient-to-r from-[#2872fa]/50 to-transparent sm:block" />
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 self-start lg:self-auto">
               <button
                 type="button"
                 onClick={previousFaq}
@@ -181,12 +179,57 @@ function FaqSection() {
             </div>
           </div>
 
-          <div className="scrollbar-none mt-8 flex gap-3 overflow-x-auto pb-1">
+          <div className="relative mt-8 overflow-hidden rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-white/[0.05] via-black/70 to-black p-6 sm:p-8">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(40,114,250,0.16),_transparent_34%)]" />
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={currentItem.question}
+                initial={{ opacity: 0, x: direction > 0 ? 40 : -40 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: direction > 0 ? -40 : 40 }}
+                transition={{ duration: 0.28, ease: 'easeOut' }}
+                className="relative"
+              >
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#2872fa] sm:text-[11px] sm:tracking-[0.24em]">
+                  Veelgestelde vraag
+                </p>
+                <h3 className="mt-3 max-w-4xl text-[1.75rem] font-black uppercase leading-[1.05] sm:mt-4 sm:text-4xl sm:leading-tight">
+                  {currentItem.question}
+                </h3>
+                <p className="mt-4 max-w-3xl text-[15px] leading-7 text-white/72 sm:mt-5 sm:text-lg sm:leading-8">
+                  {currentItem.answer}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+
+            <div className="mt-8 flex items-center gap-2">
+              {faqs.map((item, index) => (
+                <button
+                  key={item.question}
+                  type="button"
+                  onClick={() => {
+                    setDirection(index > activeFaq ? 1 : -1);
+                    setActiveFaq(index);
+                  }}
+                  aria-label={`Ga naar vraag ${index + 1}`}
+                  className={cn(
+                    'h-2.5 rounded-full transition-all',
+                    activeFaq === index ? 'w-10 bg-[#2872fa]' : 'w-2.5 bg-white/20 hover:bg-white/35',
+                  )}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="scrollbar-none mt-6 flex gap-3 overflow-x-auto pb-1">
             {faqs.map((item, index) => (
               <button
                 key={item.question}
                 type="button"
-                onClick={() => setActiveFaq(index)}
+                onClick={() => {
+                  setDirection(index > activeFaq ? 1 : -1);
+                  setActiveFaq(index);
+                }}
                 className={cn(
                   'shrink-0 rounded-full border px-4 py-3 text-[10px] font-black uppercase tracking-[0.14em] transition sm:text-[11px] sm:tracking-[0.16em]',
                   activeFaq === index
@@ -213,7 +256,7 @@ function CtaSection({ onOpenQuiz }: { onOpenQuiz: () => void }) {
             <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60 sm:text-sm sm:tracking-[0.4em]">Start jouw intake</p>
             <h2 className="mt-3 text-[2rem] font-black uppercase leading-[1.02] sm:mt-4 sm:text-5xl sm:leading-tight">Klaar om sterker te leven?</h2>
             <p className="mt-4 max-w-2xl text-[15px] leading-7 text-white/72 sm:mt-5 sm:text-base">
-              Zet vandaag de eerste stap en ontdek welk traject past bij jouw doel, jouw ritme en de manier waarop jij wilt groeien.
+              Zet vandaag de eerste stap en ontdek welk pakket past bij jouw doel, jouw ritme en wat jij nodig hebt.
             </p>
             <button
               type="button"
@@ -239,10 +282,12 @@ function CtaSection({ onOpenQuiz }: { onOpenQuiz: () => void }) {
 export default function SportLandingPage() {
   const [quizOpen, setQuizOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
-  const [programNotice, setProgramNotice] = useState<{
+  const [packageNotice, setPackageNotice] = useState<{
     type: 'success' | 'error';
     title: string;
     message: string;
+    actionLabel?: string;
+    actionHref?: string;
   } | null>(null);
 
   useEffect(() => {
@@ -341,17 +386,17 @@ export default function SportLandingPage() {
         if (json.success) {
           setQuizOpen(false);
           trackEvent('program_contact_requested', { status: 'success' });
-          setProgramNotice({
+          setPackageNotice({
             type: 'success',
             title: 'Aanvraag ontvangen',
             message:
-              'Dank voor je aanvraag. Een trainer van My Humble neemt op korte termijn contact met je op om het vervolg van jouw traject persoonlijk met je af te stemmen.',
+              'Dank voor je aanvraag. Een trainer van My Humble neemt binnenkort contact met je op om samen de volgende stap door te nemen.',
           });
           return;
         }
       } catch {
         trackEvent('program_contact_requested', { status: 'error' });
-        setProgramNotice({
+        setPackageNotice({
           type: 'error',
           title: 'Aanvraag niet verwerkt',
           message:
@@ -360,7 +405,7 @@ export default function SportLandingPage() {
         return;
       }
 
-      setProgramNotice({
+      setPackageNotice({
         type: 'error',
         title: 'Aanvraag niet verwerkt',
         message:
@@ -386,7 +431,17 @@ export default function SportLandingPage() {
       mh_package: packageKey,
       mh_training_frequency: trainingFrequency,
     });
-    window.location.assign(trackedUrl);
+    setQuizOpen(false);
+    setPackageNotice({
+      type: 'success',
+      title: 'Bijna klaar',
+      message:
+        packageKey === 'training'
+          ? 'Je keuze is ontvangen. Rond je aanmelding nu af via de beveiligde betaalpagina.'
+          : 'Je keuze is ontvangen. Rond je aanmelding nu af via de beveiligde betaalpagina.',
+      actionLabel: 'Ga door naar betalen',
+      actionHref: trackedUrl,
+    });
   }
 
   return (
@@ -406,7 +461,7 @@ export default function SportLandingPage() {
       <AnimatePresence>{privacyOpen ? <PrivacyOverlay onClose={() => setPrivacyOpen(false)} /> : null}</AnimatePresence>
 
       <AnimatePresence>
-        {programNotice ? (
+        {packageNotice ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -422,24 +477,42 @@ export default function SportLandingPage() {
               <div
                 className={cn(
                   'inline-flex rounded-full border px-4 py-2 text-[11px] font-black uppercase tracking-[0.22em]',
-                  programNotice.type === 'success'
+                  packageNotice.type === 'success'
                     ? 'border-[#2872fa]/40 bg-[#2872fa]/12 text-[#2872fa]'
                     : 'border-red-500/30 bg-red-500/10 text-red-300',
                 )}
               >
-                {programNotice.title}
+                {packageNotice.title}
               </div>
               <h3 className="mt-5 text-3xl font-black uppercase leading-tight text-white">
-                {programNotice.type === 'success' ? 'We nemen contact met je op' : 'Er is iets misgegaan'}
+                {packageNotice.type === 'success'
+                  ? packageNotice.actionHref
+                    ? 'Rond jouw keuze af'
+                    : 'We nemen contact met je op'
+                  : 'Er is iets misgegaan'}
               </h3>
-              <p className="mt-5 text-base leading-8 text-white/72">{programNotice.message}</p>
-              <button
-                type="button"
-                onClick={() => setProgramNotice(null)}
-                className={cn(primaryButtonClass, 'mt-8 px-5 py-3 text-[11px] sm:px-7 sm:py-4 sm:text-sm')}
-              >
-                Sluiten
-              </button>
+              <p className="mt-5 text-base leading-8 text-white/72">{packageNotice.message}</p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                {packageNotice.actionHref ? (
+                  <a
+                    href={packageNotice.actionHref}
+                    className={cn(primaryButtonClass, 'w-full px-5 py-3 text-[11px] sm:w-auto sm:px-7 sm:py-4 sm:text-sm')}
+                  >
+                    {packageNotice.actionLabel || 'Ga verder'}
+                  </a>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => setPackageNotice(null)}
+                  className={cn(
+                    packageNotice.actionHref
+                      ? 'inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-[11px] font-black uppercase tracking-[0.2em] text-black transition hover:scale-[1.02] sm:px-7 sm:py-4 sm:text-sm'
+                      : primaryButtonClass,
+                  )}
+                >
+                  {packageNotice.actionHref ? 'Later afronden' : 'Sluiten'}
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         ) : null}

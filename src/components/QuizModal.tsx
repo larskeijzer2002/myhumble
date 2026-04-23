@@ -460,7 +460,7 @@ export function QuizModal({ isOpen, steps, onClose, onSubmitLead, onSelectPackag
             <div>
               <p className="mb-3 text-[11px] font-black uppercase tracking-[0.22em] text-white/50">Geslacht</p>
               <div className="grid gap-3 sm:grid-cols-3">
-                {['Man', 'Vrouw', 'Anders'].map((option) => (
+                {['Man', 'Vrouw', 'Non-binair / anders'].map((option) => (
                   <button
                     key={option}
                     type="button"

@@ -48,8 +48,8 @@ export function Hero({ onOpenQuiz }: HeroProps) {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="mt-5 max-w-[21rem] text-[15px] leading-7 text-white/75 sm:mt-6 sm:max-w-2xl sm:text-lg sm:leading-8"
           >
-            My Humble is gebouwd voor mensen die meer willen dan alleen trainen. Dit is waar discipline, kracht en
-            karakter samenkomen in een aanpak die je helpt om sterker te leven.
+            My Humble is er voor mensen die meer willen dan alleen trainen. Hier draait het om sterker worden, meer
+            grip krijgen op je ritme en jezelf serieus nemen.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
