@@ -156,36 +156,42 @@ export const faqs: Faq[] = [
   {
     question: 'Welk pakket past het best bij mij?',
     answer:
-      'Dat hangt vooral af van hoeveel begeleiding je wilt en hoe je het liefst traint. My Humble Training is voor 1 op 1 coaching, My Humble Online is voor begeleiding op afstand en My Humble Program is er voor mensen die flexibel willen trainen en toch contact met hun coach willen houden.',
+      'Dat hangt af van hoeveel begeleiding je wilt en wat past bij jouw week. My Humble Training is voor persoonlijke coaching in de gym, My Humble Online is voor begeleiding op afstand en My Humble Program is voor mensen die flexibel willen trainen met een duidelijke aanpak in de app.',
   },
   {
     question: 'Hoe werkt de intake via de quiz?',
     answer:
-      'Via de quiz geef je aan wat je doel is, waar je nu staat en hoe serieus je aan de slag wilt. Daarna kies je het pakket dat het beste past bij jouw situatie.',
+      'Via de quiz laat je weten wat je doel is, waar je nu staat en hoe serieus je aan de slag wilt. Daarna kies je het pakket dat het beste aansluit bij jouw situatie.',
   },
   {
     question: 'Wat is het verschil tussen Training, Online en Program?',
     answer:
-      'My Humble Training is het meest persoonlijk en direct. My Humble Online geeft je structuur en begeleiding op afstand. My Humble Program is voor mensen die zelfstandig willen trainen, maar wel contact en richting willen houden.',
+      'My Humble Training is het meest persoonlijk en direct. My Humble Online geeft je structuur, check-ins en begeleiding op afstand. My Humble Program is voor mensen die weinig tijd hebben en zelfstandig willen trainen met korte workouts en duidelijke video’s in de app.',
   },
   {
     question: 'Moet ik direct betalen als ik een pakket kies?',
     answer:
-      'Bij My Humble Training en My Humble Online ga je na je keuze door naar de betaalpagina. Kies je My Humble Program, dan neemt een trainer eerst contact met je op.',
+      'Nee, dat hoeft niet. Je kunt ervoor kiezen om direct af te rekenen, maar je mag ook wachten tot na de intake. Zo kun je eerst rustig kijken wat het beste bij je past. Daarnaast start je bij My Humble met 14 dagen gratis proberen. Past het toch niet bij je, dan kun je binnen die periode je geld terugkrijgen.',
+  },
+  {
+    question: 'Hoe vaak kan ik personal training doen bij My Humble Training?',
+    answer:
+      'Bij My Humble Training kun je kiezen voor 1 keer per week, 2 keer per week of 3 keer of vaker. Zo kies je een ritme dat past bij jouw doel en jouw agenda.',
+  },
+  {
+    question: 'Krijg ik een app tijdens mijn traject?',
+    answer:
+      'Ja. Binnen de trajecten werk je met een app waarin je trainingen kunt inzien, je voeding kunt bijhouden en overzicht houdt op wat je moet doen. Bij Online en Program speelt die app een grote rol in de begeleiding.',
+  },
+  {
+    question: 'Wat gebeurt er nadat ik een pakket heb gekozen?',
+    answer:
+      'Na je keuze krijg je direct duidelijkheid over de volgende stap. Kies je voor My Humble Training of My Humble Online, dan kun je meteen doorgaan naar de beveiligde betaalpagina of wachten tot na de intake. Kies je voor My Humble Program, dan neemt een trainer eerst contact met je op om alles samen door te nemen. Daarna wordt jouw traject rustig en duidelijk opgestart.',
   },
   {
     question: 'Voor wie is My Humble bedoeld?',
-    answer: 'Voor mensen die serieus aan de slag willen met hun lichaam, hun ritme en hoe ze zich elke dag voelen.',
-  },
-  {
-    question: 'Krijg ik persoonlijke begeleiding tijdens mijn traject?',
     answer:
-      'Ja. De vorm verschilt per pakket, maar je krijgt altijd duidelijke begeleiding, eerlijke feedback en houvast. Hoe intensiever het pakket, hoe directer het contact.',
-  },
-  {
-    question: 'Wat gebeurt er nadat ik mijn keuze heb gemaakt?',
-    answer:
-      'Na je keuze volgt de volgende stap vanzelf. Je rondt je betaling af of er wordt contact met je opgenomen, zodat je snel kunt beginnen.',
+      'Voor mensen die voelen dat er meer in zit dan eruit komt. Als je sterker wilt worden, meer energie wilt hebben en klaar bent om echt iets te veranderen in je lichaam en je dagelijks leven, dan is My Humble voor jou. Dit is voor mensen die niet willen blijven twijfelen, maar in actie willen komen.',
   },
 ];
 

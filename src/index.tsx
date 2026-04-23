@@ -133,6 +133,7 @@ function ReviewsSection() {
 function FaqSection() {
   const [activeFaq, setActiveFaq] = useState(0);
   const [direction, setDirection] = useState(1);
+  const faqHighlights = ['Intake via quiz', 'App ondersteuning', 'Training, Online of Program'];
 
   const previousFaq = () => {
     setDirection(-1);
@@ -179,8 +180,20 @@ function FaqSection() {
             </div>
           </div>
 
+          <div className="mt-6 flex flex-wrap gap-3">
+            {faqHighlights.map((item) => (
+              <div
+                key={item}
+                className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-white/55 sm:text-[11px]"
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+
           <div className="relative mt-8 overflow-hidden rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-white/[0.05] via-black/70 to-black p-6 sm:p-8">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(40,114,250,0.16),_transparent_34%)]" />
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#2872fa]/50 to-transparent" />
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={currentItem.question}
@@ -202,22 +215,27 @@ function FaqSection() {
               </motion.div>
             </AnimatePresence>
 
-            <div className="mt-8 flex items-center gap-2">
-              {faqs.map((item, index) => (
-                <button
-                  key={item.question}
-                  type="button"
-                  onClick={() => {
-                    setDirection(index > activeFaq ? 1 : -1);
-                    setActiveFaq(index);
-                  }}
-                  aria-label={`Ga naar vraag ${index + 1}`}
-                  className={cn(
-                    'h-2.5 rounded-full transition-all',
-                    activeFaq === index ? 'w-10 bg-[#2872fa]' : 'w-2.5 bg-white/20 hover:bg-white/35',
-                  )}
-                />
-              ))}
+            <div className="mt-8 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                {faqs.map((item, index) => (
+                  <button
+                    key={item.question}
+                    type="button"
+                    onClick={() => {
+                      setDirection(index > activeFaq ? 1 : -1);
+                      setActiveFaq(index);
+                    }}
+                    aria-label={`Ga naar vraag ${index + 1}`}
+                    className={cn(
+                      'h-2.5 rounded-full transition-all',
+                      activeFaq === index ? 'w-10 bg-[#2872fa]' : 'w-2.5 bg-white/20 hover:bg-white/35',
+                    )}
+                  />
+                ))}
+              </div>
+              <div className="hidden text-[10px] font-black uppercase tracking-[0.18em] text-white/35 sm:block">
+                Swipe of klik door de vragen
+              </div>
             </div>
           </div>
 
