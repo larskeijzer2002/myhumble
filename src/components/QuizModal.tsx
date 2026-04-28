@@ -18,6 +18,7 @@ type ContactErrors = {
 type QuizModalProps = {
   isOpen: boolean;
   steps: QuizStep[];
+  startAtPackages?: boolean;
   onClose: () => void;
   onSubmitLead: (answers: QuizAnswers) => Promise<boolean>;
   onSelectPackage: (
@@ -39,24 +40,104 @@ type PackageOverviewProps = {
   answers: QuizAnswers;
 };
 
-type PackageDetailSection = 'who' | 'focus' | 'approach';
-
-function PackageDetailPanel({ label, children }: { label: string; children: ReactNode }) {
+function FunnelStep({
+  number,
+  title,
+  description,
+  children,
+  isLast = false,
+}: {
+  number: string;
+  title: string;
+  description: string;
+  children: ReactNode;
+  isLast?: boolean;
+}) {
   return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-white/[0.06] via-black/70 to-black p-7 sm:p-8 lg:p-9">
-      <div className="mb-5 text-[11px] font-black uppercase tracking-[0.28em] text-[#2872fa]">{label}</div>
-      {children}
+    <div className="relative overflow-hidden rounded-[1.6rem] border border-white/10 bg-gradient-to-br from-white/[0.05] via-black/75 to-black p-6 sm:p-7">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(40,114,250,0.12),_transparent_35%)]" />
+      <div className="relative">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#2872fa] text-sm font-black text-white">
+              {number}
+            </div>
+            {!isLast ? <div className="absolute left-1/2 top-12 h-10 w-px -translate-x-1/2 bg-gradient-to-b from-[#2872fa]/40 to-transparent" /> : null}
+          </div>
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#2872fa]">Stap {number}</p>
+            <h4 className="mt-1 text-xl font-black uppercase text-white sm:text-2xl">{title}</h4>
+          </div>
+        </div>
+        <p className="mt-4 max-w-2xl text-[15px] leading-7 text-white/68 sm:text-base sm:leading-8">{description}</p>
+        <div className="mt-6">{children}</div>
+      </div>
     </div>
   );
 }
 
+function getPackageFlowCopy(activePackage: PackagePlan) {
+  if (activePackage.key === 'training') {
+    return {
+      badge: '1-op-1 begeleiding',
+      stepOne:
+        'Dit pakket is gemaakt voor mensen die niet langer willen blijven twijfelen, maar willen voelen hoe het is om echt begeleid te worden.',
+      stepTwo:
+        'Je krijgt een aanpak waarmee je niet alleen traint, maar stap voor stap werkt aan meer energie, meer structuur en zichtbaar resultaat.',
+      stepThree:
+        'Kies hieronder het ritme dat past bij jouw week en bij het niveau waarop jij nu wilt instappen.',
+      cta:
+        'Je ziet hierboven precies voor wie dit pakket is, wat je krijgt en hoe je begint. Kies nu het ritme dat bij je past.',
+      after: [
+        'Je kiest het ritme dat past bij jouw week.',
+        'Je rondt je keuze af via de beveiligde betaalpagina.',
+        'Daarna starten we jouw traject helder en persoonlijk op.',
+      ],
+    };
+  }
+
+  if (activePackage.key === 'online') {
+    return {
+      badge: 'Online begeleiding',
+      stepOne:
+        'Dit pakket is voor mensen die zelfstandig willen trainen, maar wel richting, contact en duidelijkheid nodig hebben om het echt vol te houden.',
+      stepTwo:
+        'Je krijgt overzicht in de app, vaste check-ins en begeleiding die je helpt om niet terug te vallen in losse pogingen.',
+      stepThree:
+        'Hier zie je hoe het pakket in de praktijk werkt, zodat je vooraf precies weet wat je kunt verwachten zodra je begint.',
+      cta:
+        'Als jij klaar bent om niet meer alles zelf uit te zoeken, dan is dit het moment om door te pakken.',
+      after: [
+        'Je kiest het pakket dat bij jou past.',
+        'Je rondt je keuze af via de beveiligde betaalpagina.',
+        'Daarna wordt jouw traject duidelijk en persoonlijk opgestart.',
+      ],
+    };
+  }
+
+  return {
+    badge: 'Flexibel programma',
+    stepOne:
+      'Dit pakket is voor mensen die wel willen, maar merken dat tijdgebrek, onrust en te weinig ritme ze steeds opnieuw tegenhouden.',
+    stepTwo:
+      'Je krijgt een aanpak die haalbaar voelt, met korte trainingen, duidelijke video’s en begeleiding die je helpt om weer in beweging te komen.',
+    stepThree:
+      'Hier zie je hoe het programma werkt in jouw dagelijks leven, zodat je vooraf voelt of dit past bij wat jij nodig hebt.',
+    cta:
+      'Als jij iets zoekt dat echt in je leven past, dan is dit het moment om die stap voor jezelf te zetten.',
+    after: [
+      'Je aanvraag komt direct binnen bij My Humble.',
+      'Een trainer neemt contact met je op om alles rustig door te nemen.',
+      'Daarna start je met een plan dat past bij jouw ritme en doel.',
+    ],
+  };
+}
+
 function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage, answers }: PackageOverviewProps) {
-  const [activeSection, setActiveSection] = useState<PackageDetailSection>('who');
   const [selectedTrainingFrequency, setSelectedTrainingFrequency] = useState<TrainingFrequencyKey | null>(null);
   const [trainingSelectionError, setTrainingSelectionError] = useState('');
 
   useEffect(() => {
-    setActiveSection('who');
     setSelectedTrainingFrequency(null);
     setTrainingSelectionError('');
   }, [activePackage]);
@@ -68,41 +149,42 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
   }, [activePackage]);
 
   if (activePackage) {
-    const sectionContent: Record<PackageDetailSection, { label: string; content: ReactNode }> = {
-      who: {
-        label: 'Voor wie het is',
-        content: <p className="text-base leading-8 text-white/80">{activePackage.forWho}</p>,
-      },
-      focus: {
-        label: 'Waar we aan werken',
-        content: (
-          <ul className="space-y-3 text-base leading-8 text-white/80">
-            {activePackage.includes.map((item) => (
-              <li key={item}>• {item}</li>
-            ))}
-          </ul>
-        ),
-      },
-      approach: {
-        label: 'Hoe we aan de slag gaan',
-        content: <p className="text-base leading-8 text-white/80">{activePackage.story}</p>,
-      },
+    const flowCopy = getPackageFlowCopy(activePackage);
+    const isTrainingPackage = activePackage.key === 'training';
+
+    const handlePrimaryAction = () => {
+      if (isTrainingPackage) {
+        if (!selectedTrainingFrequency) {
+          setTrainingSelectionError('Kies eerst hoeveel personal training sessies per week je wilt.');
+          trackEvent('training_frequency_missing', { package_name: activePackage.key });
+          return;
+        }
+
+        trackEvent('checkout_clicked', {
+          package_name: activePackage.key,
+          training_frequency: selectedTrainingFrequency,
+        });
+        void onSelectPackage(activePackage.key, answers, selectedTrainingFrequency);
+        return;
+      }
+
+      trackEvent('checkout_clicked', {
+        package_name: activePackage.key,
+        training_frequency: selectedTrainingFrequency ?? '',
+      });
+      void onSelectPackage(activePackage.key, answers, selectedTrainingFrequency ?? undefined);
     };
 
-    const sectionTabs: Array<{ key: PackageDetailSection; label: string }> = [
-      { key: 'who', label: 'Voor wie het is' },
-      { key: 'focus', label: 'Waar we aan werken' },
-      { key: 'approach', label: 'Hoe we aan de slag gaan' },
-    ];
-
     return (
-      <div className="space-y-6">
+      <div className="space-y-5">
         <button type="button" onClick={onBack} className={cn(ghostButtonClass, 'w-full px-5 py-3 text-[11px] sm:w-auto sm:px-7 sm:py-4 sm:text-sm')}>
           Terug naar pakketten
         </button>
-        <div className="rounded-[1.9rem] border border-white/10 bg-white/[0.03] p-5 sm:p-8 lg:p-10">
-          <div className="relative mb-8 overflow-hidden rounded-[1.6rem] border border-white/10">
-            <img src={activePackage.image} alt={activePackage.title} className="h-56 w-full object-cover sm:h-80 lg:h-[26rem]" />
+
+        <div className="overflow-hidden rounded-[1.9rem] border border-white/10 bg-white/[0.03]">
+          <div className="relative border-b border-white/10">
+            <img src={activePackage.image} alt={activePackage.title} className="h-56 w-full object-cover sm:h-80 lg:h-[24rem]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
             {activePackage.isNew ? (
               <div className="absolute right-5 top-5 inline-flex items-center gap-2 rounded-full border border-[#2872fa]/35 bg-black/65 px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.24em] text-white shadow-[0_0_30px_rgba(40,114,250,0.24)] backdrop-blur-md">
                 <span className="relative flex h-2.5 w-2.5">
@@ -112,127 +194,140 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
                 Nieuw traject
               </div>
             ) : null}
-          </div>
-          <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:gap-10">
-            <div>
-              <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#2872fa]">Traject informatie</p>
-              <h3 className="mt-4 text-[2rem] font-black uppercase leading-[1.02] sm:text-5xl sm:leading-tight">{activePackage.title}</h3>
-              <p className="mt-3 text-xs font-black uppercase tracking-[0.2em] text-white/45">{activePackage.tag}</p>
-              <p className="mt-5 max-w-2xl text-base leading-8 text-white/80 sm:mt-6 sm:text-lg sm:leading-9 lg:text-[1.15rem] lg:leading-10">{activePackage.description}</p>
-
-              <div className="scrollbar-none mt-8 flex gap-3 overflow-x-auto pb-1">
-                {sectionTabs.map((tab) => (
-                <button
-                  key={tab.key}
-                  type="button"
-                    onClick={() => setActiveSection(tab.key)}
-                    className={cn(
-                      'shrink-0 rounded-full border px-4 py-3 text-[10px] font-black uppercase tracking-[0.14em] transition sm:text-[11px] sm:tracking-[0.18em]',
-                      activeSection === tab.key
-                        ? 'border-[#2872fa] bg-[#2872fa] text-white'
-                        : 'border-white/10 bg-black/50 text-white/65 hover:border-white/25 hover:text-white',
-                    )}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="mt-6">
-                <PackageDetailPanel label={sectionContent[activeSection].label}>
-                  {sectionContent[activeSection].content}
-                </PackageDetailPanel>
-              </div>
-
-              {activePackage.key === 'training' && activePackage.trainingFrequencies ? (
-                <div className="mt-6">
-                  <PackageDetailPanel label="Kies jouw personal training ritme">
-                    <div className="grid gap-3">
-                      {activePackage.trainingFrequencies.map((option) => (
-                        <button
-                          key={option.key}
-                          type="button"
-                          onClick={() => {
-                            setSelectedTrainingFrequency(option.key);
-                            setTrainingSelectionError('');
-                            trackEvent('training_frequency_selected', {
-                              package_name: activePackage.key,
-                              training_frequency: option.key,
-                            });
-                          }}
-                          className={cn(
-                            'rounded-[1.25rem] border px-5 py-4 text-left transition',
-                            selectedTrainingFrequency === option.key
-                              ? 'border-[#2872fa] bg-[#2872fa]/12'
-                              : 'border-white/10 bg-black/40 hover:border-white/25',
-                          )}
-                        >
-                          <p className="text-sm font-black uppercase tracking-[0.16em] text-white">{option.label}</p>
-                          <p className="mt-2 text-sm leading-7 text-white/65">{option.description}</p>
-                        </button>
-                      ))}
-                    </div>
-                  </PackageDetailPanel>
+            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-8 lg:p-10">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="rounded-full border border-[#2872fa]/30 bg-[#2872fa]/12 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#2872fa] sm:text-[11px]">
+                  {flowCopy.badge}
                 </div>
-              ) : null}
+                <div className="rounded-full border border-white/10 bg-black/45 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-white/70 sm:text-[11px]">
+                  14 dagen gratis proberen
+                </div>
+              </div>
+              <h3 className="mt-4 max-w-3xl text-[1.9rem] font-black uppercase leading-[1.02] text-white sm:text-5xl">
+                {activePackage.title}
+              </h3>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/78 sm:text-lg sm:leading-8">
+                {activePackage.description}
+              </p>
+            </div>
+          </div>
+
+          <div className="p-4 sm:p-8 lg:p-10">
+            <div className="grid gap-4">
+              <FunnelStep number="01" title="Voor wie dit is" description={flowCopy.stepOne}>
+                <p className="text-[15px] leading-7 text-white/80 sm:text-base sm:leading-8">{activePackage.forWho}</p>
+              </FunnelStep>
+
+              <FunnelStep number="02" title={isTrainingPackage ? 'Wat je krijgt en kunt verwachten' : 'Wat je krijgt'} description={flowCopy.stepTwo}>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {activePackage.includes.map((item, index) => (
+                    <div key={item} className="rounded-[1.15rem] border border-white/10 bg-black/35 px-4 py-4">
+                      <div className="flex items-start gap-3">
+                        <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#2872fa]/12 text-[10px] font-black text-[#2872fa]">
+                          {index + 1}
+                        </div>
+                        <p className="text-sm leading-7 text-white/78">{item}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </FunnelStep>
+
+              <FunnelStep
+                number="03"
+                title={isTrainingPackage ? 'Kies het ritme dat bij je past' : 'Hoe dit in de praktijk werkt'}
+                description={flowCopy.stepThree}
+                isLast
+              >
+                {isTrainingPackage ? (
+                  <div className="grid gap-3">
+                    {activePackage.trainingFrequencies?.map((option) => (
+                      <button
+                        key={option.key}
+                        type="button"
+                        onClick={() => {
+                          setSelectedTrainingFrequency(option.key);
+                          setTrainingSelectionError('');
+                          trackEvent('training_frequency_selected', {
+                            package_name: activePackage.key,
+                            training_frequency: option.key,
+                          });
+                        }}
+                        className={cn(
+                          'rounded-[1.2rem] border px-4 py-4 text-left transition',
+                          selectedTrainingFrequency === option.key
+                            ? 'border-[#2872fa] bg-[#2872fa]/10 shadow-[0_0_0_1px_rgba(40,114,250,0.25)]'
+                            : 'border-white/10 bg-black/35 hover:border-white/25',
+                        )}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-black uppercase tracking-[0.16em] text-white">{option.label}</p>
+                            <p className="mt-1.5 text-sm leading-7 text-white/65">{option.description}</p>
+                          </div>
+                          <div
+                            className={cn(
+                              'mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition',
+                              selectedTrainingFrequency === option.key
+                                ? 'border-[#2872fa] bg-[#2872fa] text-white'
+                                : 'border-white/20 text-transparent',
+                            )}
+                          >
+                            ✓
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[15px] leading-7 text-white/80 sm:text-base sm:leading-8">{activePackage.story}</p>
+                )}
+              </FunnelStep>
             </div>
 
-            <div className="space-y-6">
-              <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-[#2872fa]/14 via-black to-black p-6 sm:p-7">
-                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-white/50">Wat dit oplevert</p>
-                <p className="mt-4 text-base leading-8 text-white/80">{activePackage.outcome}</p>
+            <div className="mt-4 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+              <div className="rounded-[1.55rem] border border-white/10 bg-gradient-to-br from-[#2872fa]/12 via-[#080d16] to-black p-5 sm:p-6">
+                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#2872fa]">Wat dit je oplevert</p>
+                <p className="mt-3 text-[15px] leading-7 text-white/82 sm:text-base sm:leading-8">{activePackage.outcome}</p>
               </div>
 
-              <div className="rounded-[1.5rem] border border-white/10 bg-black/55 p-6 sm:p-7">
-                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#2872fa]">Na je aankoop</p>
-                <p className="mt-4 text-sm leading-7 text-white/72">
-                  Na je aankoop neemt een trainer van My Humble contact met je op om jouw traject op te starten en de
-                  volgende stap samen af te stemmen.
-                </p>
-              </div>
-
-              <div className="rounded-[1.5rem] border border-white/10 bg-black/60 p-6 sm:p-7">
-                <div className="rounded-[1.25rem] border border-[#2872fa]/20 bg-gradient-to-br from-[#2872fa]/18 via-[#0b1220] to-black p-4 sm:p-5">
-                  <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#2872fa]">Direct starten</p>
-                  <h4 className="mt-3 text-xl font-black uppercase leading-tight text-white sm:text-2xl">
-                    Klaar om dit traject te claimen?
-                  </h4>
-                  <p className="mt-4 text-sm leading-7 text-white/72">
-                    Kies dit traject als dit aansluit op jouw niveau en de manier waarop jij begeleid wilt worden.
-                  </p>
-                  <div className="mt-5 flex items-center gap-3">
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#2872fa]" />
-                    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-white/55">
-                      Intake, keuze en direct door
-                    </p>
-                  </div>
+              <div className="rounded-[1.55rem] border border-white/10 bg-black/40 p-5 sm:p-6">
+                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-white/52">Zo gaat het verder</p>
+                <div className="mt-3 space-y-2.5">
+                  {flowCopy.after.map((item) => (
+                    <div key={item} className="flex items-start gap-3">
+                      <div className="mt-2 h-1.5 w-1.5 rounded-full bg-[#2872fa]" />
+                      <p className="text-sm leading-6 text-white/72">{item}</p>
+                    </div>
+                  ))}
                 </div>
-                <div className="mt-6 flex flex-col gap-3">
+              </div>
+            </div>
+
+            <div className="mt-4 rounded-[1.7rem] border border-white/10 bg-gradient-to-br from-white/[0.04] via-black/80 to-black p-5 sm:p-6">
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+                <div className="max-w-xl">
+                  <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#2872fa]">Direct starten</p>
+                  <h4 className="mt-3 text-2xl font-black uppercase leading-[1.04] text-white sm:text-[2rem]">
+                    Klaar om dit pakket te kiezen?
+                  </h4>
+                  <p className="mt-3 text-sm leading-7 text-white/74 sm:text-[15px]">{flowCopy.cta}</p>
+                </div>
+
+                <div className="w-full max-w-md space-y-3">
                   <button
                     type="button"
-                    onClick={() => {
-                      if (activePackage.key === 'training' && !selectedTrainingFrequency) {
-                        setTrainingSelectionError('Kies eerst hoeveel personal training sessies per week je wilt.');
-                        trackEvent('training_frequency_missing', { package_name: activePackage.key });
-                        return;
-                      }
-
-                      trackEvent('checkout_clicked', {
-                        package_name: activePackage.key,
-                        training_frequency: selectedTrainingFrequency ?? '',
-                      });
-                      void onSelectPackage(activePackage.key, answers, selectedTrainingFrequency ?? undefined);
-                    }}
+                    onClick={handlePrimaryAction}
                     className={cn(primaryButtonClass, 'w-full px-5 py-3 text-[11px] sm:px-7 sm:py-4 sm:text-sm')}
                   >
                     Kies dit pakket
                   </button>
-                  {activePackage.key === 'training' && trainingSelectionError ? (
-                    <p className="text-xs uppercase tracking-[0.16em] text-[#2872fa]">
-                      {trainingSelectionError}
-                    </p>
-                  ) : null}
-                  <button type="button" onClick={onBack} className={cn(ghostButtonClass, 'w-full px-5 py-3 text-[11px] sm:px-7 sm:py-4 sm:text-sm')}>
+                  {trainingSelectionError ? <p className="text-xs uppercase tracking-[0.16em] text-[#2872fa]">{trainingSelectionError}</p> : null}
+                  <button
+                    type="button"
+                    onClick={onBack}
+                    className={cn(ghostButtonClass, 'w-full px-5 py-3 text-[11px] sm:px-7 sm:py-4 sm:text-sm')}
+                  >
                     Bekijk andere pakketten
                   </button>
                 </div>
@@ -331,7 +426,7 @@ function isValidPhone(value: string) {
   return isDutchMobile || isDutchLandline;
 }
 
-export function QuizModal({ isOpen, steps, onClose, onSubmitLead, onSelectPackage }: QuizModalProps) {
+export function QuizModal({ isOpen, steps, startAtPackages = false, onClose, onSubmitLead, onSelectPackage }: QuizModalProps) {
   const [step, setStep] = useState(0);
   const [selectedPackage, setSelectedPackage] = useState<PackageKey | null>(null);
   const [answers, setAnswers] = useState<QuizAnswers>(initialAnswers);
@@ -342,13 +437,18 @@ export function QuizModal({ isOpen, steps, onClose, onSubmitLead, onSelectPackag
 
   useEffect(() => {
     if (!isOpen) {
-      setStep(0);
+      setStep(startAtPackages ? steps.length : 0);
       setSelectedPackage(null);
       setSubmitStatus({ type: 'idle', message: '' });
       setAnswers(initialAnswers);
       setContactErrors({});
     }
-  }, [isOpen]);
+  }, [isOpen, startAtPackages, steps.length]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setStep(startAtPackages ? steps.length : 0);
+  }, [isOpen, startAtPackages, steps.length]);
 
   useEffect(() => {
     if (!isOpen) return;

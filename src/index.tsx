@@ -7,8 +7,8 @@ import { NavBar } from './components/NavBar';
 import { PrivacyOverlay } from './components/PrivacyOverlay';
 import { QuizModal } from './components/QuizModal';
 import { SectionHeader } from './components/SectionHeader';
-import { benefits, COMPANY_EMAIL, faqs, IMAGES, pillars, quizSteps, STRIPE_LINKS, testimonials, TRAINING_STRIPE_LINKS, WEB3FORMS_KEY, type PackageKey, type QuizAnswers, type TrainingFrequencyKey } from './data/siteContent';
-import { buildTrackedStripeUrl, trackEvent, trackPageView } from './lib/tracking';
+import { benefits, COMPANY_EMAIL, faqs, IMAGES, pillars, quizSteps, testimonials, WEB3FORMS_KEY, type PackageKey, type QuizAnswers, type TrainingFrequencyKey } from './data/siteContent';
+import { trackEvent, trackPageView } from './lib/tracking';
 import { cn, primaryButtonClass } from './lib/utils';
 
 function Reveal({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
@@ -300,6 +300,7 @@ function CtaSection({ onOpenQuiz }: { onOpenQuiz: () => void }) {
 export default function SportLandingPage() {
   const [quizOpen, setQuizOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [startAtPackages, setStartAtPackages] = useState(false);
   const [packageNotice, setPackageNotice] = useState<{
     type: 'success' | 'error';
     title: string;
@@ -319,6 +320,19 @@ export default function SportLandingPage() {
     handleRouteTracking();
     window.addEventListener('hashchange', handleRouteTracking);
     return () => window.removeEventListener('hashchange', handleRouteTracking);
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const shouldOpenPackages =
+      params.get('view') === 'pakketten' ||
+      params.get('view') === 'packages' ||
+      params.get('packages') === '1';
+
+    if (shouldOpenPackages) {
+      setStartAtPackages(true);
+      setQuizOpen(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -370,59 +384,88 @@ export default function SportLandingPage() {
   }
 
   async function goToStripe(packageKey: PackageKey, answers: QuizAnswers, trainingFrequency?: TrainingFrequencyKey) {
-    if (packageKey === 'program') {
-      try {
-        const response = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({
-            access_key: WEB3FORMS_KEY,
-            subject: 'My Humble Program contactverzoek',
-            from_name: 'My Humble Website',
-            replyto: answers.email,
-            name: answers.firstName,
-            email: answers.email,
-            phone: answers.phone,
-            email_to: COMPANY_EMAIL,
-            message:
-              `Nieuwe aanvraag voor My Humble Program.\n\n` +
-              `Naam: ${answers.firstName}\n` +
-              `Email: ${answers.email}\n` +
-              `Telefoon: ${answers.phone}\n\n` +
-              `Geslacht: ${answers.gender}\n` +
-              `Lengte: ${answers.height} cm\n` +
-              `Gewicht: ${answers.weight} kg\n\n` +
-              `Doel: ${answers.goal}\n` +
-              `Niveau: ${answers.level}\n` +
-              `Commitment: ${answers.commitment}\n\n` +
-              `Actie: Bezoeker heeft gekozen voor My Humble Program en verwacht contact van een trainer.`,
-          }),
-        });
+    if (!answers.firstName || !answers.email || !answers.phone) {
+      setPackageNotice({
+        type: 'error',
+        title: 'Vul eerst je intake in',
+        message:
+          'Om dit pakket aan te vragen hebben we eerst je gegevens nodig. Open de intake via de homepage en vul de quiz kort in, dan kan een trainer daarna contact met je opnemen.',
+      });
+      return;
+    }
 
-        const json = (await response.json()) as { success?: boolean };
+    const packageLabel =
+      packageKey === 'training'
+        ? 'My Humble Training'
+        : packageKey === 'online'
+          ? 'My Humble Online'
+          : 'My Humble Program';
 
-        if (json.success) {
-          setQuizOpen(false);
-          trackEvent('program_contact_requested', { status: 'success' });
-          setPackageNotice({
-            type: 'success',
-            title: 'Aanvraag ontvangen',
-            message:
-              'Dank voor je aanvraag. Een trainer van My Humble neemt binnenkort contact met je op om samen de volgende stap door te nemen.',
-          });
-          return;
-        }
-      } catch {
-        trackEvent('program_contact_requested', { status: 'error' });
-        setPackageNotice({
-          type: 'error',
-          title: 'Aanvraag niet verwerkt',
+    const frequencyLabel =
+      packageKey === 'training' && trainingFrequency
+        ? trainingFrequency === 'once'
+          ? '1 keer per week'
+          : trainingFrequency === 'twice'
+            ? '2 keer per week'
+            : '3 keer per week'
+        : '';
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_KEY,
+          subject: `${packageLabel} contactverzoek`,
+          from_name: 'My Humble Website',
+          replyto: answers.email,
+          name: answers.firstName,
+          email: answers.email,
+          phone: answers.phone,
+          email_to: COMPANY_EMAIL,
+          package_name: packageLabel,
+          training_frequency: frequencyLabel,
           message:
-            'Er ging iets mis bij het verwerken van je aanvraag. Probeer het opnieuw of neem direct contact op via info@myhumble.nl.',
+            `Nieuwe aanvraag voor ${packageLabel}.\n\n` +
+            `Pakket: ${packageLabel}\n` +
+            (frequencyLabel ? `Trainingsfrequentie: ${frequencyLabel}\n` : '') +
+            `\n` +
+            `Naam: ${answers.firstName}\n` +
+            `Email: ${answers.email}\n` +
+            `Telefoon: ${answers.phone}\n\n` +
+            `Geslacht: ${answers.gender}\n` +
+            `Lengte: ${answers.height} cm\n` +
+            `Gewicht: ${answers.weight} kg\n\n` +
+            `Doel: ${answers.goal}\n` +
+            `Niveau: ${answers.level}\n` +
+            `Commitment: ${answers.commitment}\n` +
+            `\nActie: Bezoeker heeft gekozen voor ${packageLabel} en verwacht contact van een trainer.`,
+        }),
+      });
+
+      const json = (await response.json()) as { success?: boolean };
+
+      if (json.success) {
+        setQuizOpen(false);
+        trackEvent('program_contact_requested', {
+          status: 'success',
+          package_name: packageKey,
+          training_frequency: trainingFrequency ?? '',
+        });
+        setPackageNotice({
+          type: 'success',
+          title: 'Aanvraag ontvangen',
+          message:
+            'Dank voor je aanvraag. Een trainer van My Humble neemt binnenkort contact met je op om samen de volgende stap door te nemen.',
         });
         return;
       }
-
+    } catch {
+      trackEvent('program_contact_requested', {
+        status: 'error',
+        package_name: packageKey,
+        training_frequency: trainingFrequency ?? '',
+      });
       setPackageNotice({
         type: 'error',
         title: 'Aanvraag niet verwerkt',
@@ -432,49 +475,62 @@ export default function SportLandingPage() {
       return;
     }
 
-    const url =
-      packageKey === 'training'
-        ? (trainingFrequency ? TRAINING_STRIPE_LINKS[trainingFrequency] : '')
-        : STRIPE_LINKS[packageKey];
-
-    if (!url || url.includes('REPLACE_')) {
-      window.alert(
-        packageKey === 'training'
-          ? 'Vul eerst je echte Stripe-betaallink in voor deze trainingsfrequentie.'
-          : 'Vul eerst je echte Stripe-betaallink in voor dit pakket.',
-      );
-      return;
-    }
-    const trackedUrl = buildTrackedStripeUrl(url, {
-      mh_package: packageKey,
-      mh_training_frequency: trainingFrequency,
-    });
-    setQuizOpen(false);
     setPackageNotice({
-      type: 'success',
-      title: 'Bijna klaar',
+      type: 'error',
+      title: 'Aanvraag niet verwerkt',
       message:
-        packageKey === 'training'
-          ? 'Je keuze is ontvangen. Rond je aanmelding nu af via de beveiligde betaalpagina.'
-          : 'Je keuze is ontvangen. Rond je aanmelding nu af via de beveiligde betaalpagina.',
-      actionLabel: 'Ga door naar betalen',
-      actionHref: trackedUrl,
+        'Er ging iets mis bij het verwerken van je aanvraag. Probeer het opnieuw of neem direct contact op via info@myhumble.nl.',
     });
   }
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-[#2872fa] selection:text-white">
-      <NavBar onOpenQuiz={() => setQuizOpen(true)} />
-      <Hero onOpenQuiz={() => setQuizOpen(true)} />
+      <NavBar
+        onOpenQuiz={() => {
+          setStartAtPackages(false);
+          setQuizOpen(true);
+        }}
+      />
+      <Hero
+        onOpenQuiz={() => {
+          setStartAtPackages(false);
+          setQuizOpen(true);
+        }}
+      />
       <BenefitSection />
       <PillarSection />
       <AboutSection />
-      <CtaSection onOpenQuiz={() => setQuizOpen(true)} />
+      <CtaSection
+        onOpenQuiz={() => {
+          setStartAtPackages(false);
+          setQuizOpen(true);
+        }}
+      />
       <ReviewsSection />
       <FaqSection />
-      <Footer onOpenQuiz={() => setQuizOpen(true)} onOpenPrivacy={() => setPrivacyOpen(true)} />
+      <Footer
+        onOpenQuiz={() => {
+          setStartAtPackages(false);
+          setQuizOpen(true);
+        }}
+        onOpenPrivacy={() => setPrivacyOpen(true)}
+      />
 
-      <AnimatePresence>{quizOpen ? <QuizModal isOpen={quizOpen} onClose={() => setQuizOpen(false)} onSubmitLead={submitLead} onSelectPackage={goToStripe} steps={quizSteps} /> : null}</AnimatePresence>
+      <AnimatePresence>
+        {quizOpen ? (
+          <QuizModal
+            isOpen={quizOpen}
+            startAtPackages={startAtPackages}
+            onClose={() => {
+              setQuizOpen(false);
+              setStartAtPackages(false);
+            }}
+            onSubmitLead={submitLead}
+            onSelectPackage={goToStripe}
+            steps={quizSteps}
+          />
+        ) : null}
+      </AnimatePresence>
 
       <AnimatePresence>{privacyOpen ? <PrivacyOverlay onClose={() => setPrivacyOpen(false)} /> : null}</AnimatePresence>
 

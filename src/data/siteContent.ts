@@ -235,20 +235,20 @@ export const packages: PackagePlan[] = [
     tag: '1-op-1 coaching',
     image: IMAGES.transform,
     description:
-      'Een persoonlijk coachingstraject voor mensen die serieus aan de slag willen met hun lichaam, energie en ritme.',
+      'Voor mensen die voelen dat het tijd is om echt werk te maken van hun lichaam, energie en ritme, met persoonlijke coaching die je scherp houdt.',
     forWho:
-      'Voor mensen die klaar zijn met aanmodderen en gericht willen werken aan hun lichaam, mindset en routine met persoonlijke begeleiding in een prive gym.',
+      'Voor mensen die klaar zijn met aanmodderen en nu willen voelen hoe het is om echt begeleid te worden. Je wilt niet langer twijfelen of half beginnen, maar serieus bouwen aan je lichaam, je mindset en hoe je je elke dag voelt.',
     includes: [
-      'Je lichaam verbeteren met een persoonlijke aanpak',
-      'Meer energie en focus gedurende de dag',
-      'Een voedingsplan dat aansluit op jouw leefritme en doelen',
-      'Je trainingen en voeding makkelijk inzien en bijhouden in de app die je krijgt',
-      'Meer structuur opbouwen en gemotiveerd blijven',
+      'Persoonlijke training die volledig is afgestemd op jouw doel en niveau',
+      'Meer energie, focus en vertrouwen in je dagelijks leven',
+      'Een voedingsplan dat past bij jouw ritme in plaats van ertegenin werkt',
+      'Een app waarin je jouw trainingen en voeding makkelijk kunt volgen',
+      'Meer structuur, duidelijkheid en motivatie om het vol te houden',
     ],
     outcome:
-      'Je bouwt aan een sterker lichaam, meer zelfvertrouwen en een ritme dat je vol kunt houden.',
+      'Je merkt niet alleen verschil in de spiegel, maar ook in je energie, je ritme en hoe stevig je in je dag staat.',
     story:
-      'Bij My Humble Training ga je zelfstandig aan de slag met begeleiding die echt bij je past. Je traint 1 of meerdere keren per week met personal training, krijgt een schema op maat, een voedingsplan dat aansluit op jouw leven en coaching op mindset. Alles staat overzichtelijk in de app, zodat je precies weet wat je moet doen. Dit pakket is bedoeld voor mensen die niet zomaar wat willen doen, maar echt vooruit willen.',
+      'Bij My Humble Training werk je met een aanpak die voelt alsof alles eindelijk op zijn plek valt. Je traint 1 of meerdere keren per week met personal training, krijgt een plan op maat en bouwt aan gewoontes die niet na twee weken weer wegvallen. Alles staat overzichtelijk in de app, zodat je precies weet wat je moet doen en waar je naartoe werkt. Dit is voor mensen die niet zomaar willen sporten, maar echt vooruit willen.',
     trainingFrequencies: [
       {
         key: 'once',
@@ -273,19 +273,19 @@ export const packages: PackagePlan[] = [
     tag: 'Online begeleiding',
     image: IMAGES.online,
     description:
-      'Een online coachingstraject voor mensen die duidelijkheid willen, persoonlijk contact zoeken en thuis of in de gym zelfstandig willen trainen.',
+      'Voor mensen die zelfstandig willen trainen, maar wel behoefte hebben aan richting, contact en een plan dat ervoor zorgt dat je blijft doorgaan.',
     forWho:
-      'Voor mensen die zelfstandig willen trainen, maar niet steeds zelf willen uitzoeken wat werkt of waar ze moeten beginnen.',
+      'Voor mensen die het liefst zelfstandig trainen, maar niet langer alles zelf willen uitzoeken. Je wilt duidelijkheid, een coach die met je meekijkt en een aanpak die je helpt om echt resultaat te boeken.',
     includes: [
-      'Werken aan je fysieke doelen met een duidelijk plan in de app',
-      'Meer grip krijgen op je voeding en ontdekken wat bij je past',
-      'Wekelijkse check-ins om je scherp en op schema te houden',
-      'Gewoontes opbouwen die je echt volhoudt',
+      'Een duidelijk trainingsplan in de app dat past bij jouw doel',
+      'Meer grip op je voeding zonder onnodige regels en extremen',
+      'Wekelijkse check-ins zodat je scherp blijft en niet verslapt',
+      'Meer structuur en gewoontes die je ook op lange termijn volhoudt',
     ],
     outcome:
-      'Je werkt aan resultaat, meer structuur en een aanpak die past bij jouw leven.',
+      'Je voelt meer grip, meer rust en meer vertrouwen, omdat je eindelijk weet wat je doet en waarom je het doet.',
     story:
-      'Bij My Humble Online train je zelfstandig, maar sta je er niet alleen voor. Via de app zie je precies wat je gaat trainen, houd je je voeding bij en blijf je in contact met je coach. Met wekelijkse check-ins kijken we hoe het gaat en sturen we bij waar nodig. Geen extreme aanpak, maar een manier van werken die bij je leven past en waar je echt iets aan hebt.',
+      'Bij My Humble Online train je zelfstandig, maar je staat er niet alleen voor. Via de app zie je precies wat je gaat doen, houd je je voeding bij en blijf je in contact met je coach. Met vaste check-ins kijken we waar je staat, wat beter kan en hoe je door blijft pakken. Dit pakket is voor mensen die vrijheid willen, maar wel de zekerheid van een sterke begeleiding op de achtergrond.',
   },
   {
     key: 'program',
@@ -293,21 +293,21 @@ export const packages: PackagePlan[] = [
     tag: 'Nieuw programma',
     image: IMAGES.program,
     description:
-      'Een nieuw coachingstraject voor mensen die fitter en sterker willen worden, maar steeds vastlopen op tijd, structuur, motivatie of resultaat.',
+      'Voor mensen die fitter en sterker willen worden, maar merken dat tijdgebrek, onrust en gebrek aan ritme steeds in de weg blijven zitten.',
     forWho:
-      'Voor mensen die aan hun lichaam en conditie willen werken, maar merken dat drukte en gebrek aan ritme steeds in de weg zitten.',
+      'Voor mensen die aan hun lichaam en conditie willen werken, maar telkens merken dat een druk leven, weinig structuur of te weinig motivatie het overneemt. Je wilt wel, maar het moet haalbaar blijven.',
     includes: [
-      'Kant-en-klare video workouts in de app die je direct kunt volgen',
-      'Trainingen van maximaal 45 minuten die passen in een druk leven',
-      'Een praktische aanpak die helpt om meer structuur en ritme op te bouwen',
-      'Ondersteuning om gemotiveerd te blijven en resultaat zichtbaar te maken',
-      'Direct contact met je trainer voor vragen, feedback en begeleiding',
-      'Voeding bijhouden en inzicht krijgen via de app',
+      'Korte, duidelijke video workouts in de app die je meteen kunt volgen',
+      'Trainingen van maximaal 45 minuten die passen in een volle week',
+      'Meer ritme en structuur zonder dat sporten voelt als extra stress',
+      'Begeleiding om gemotiveerd te blijven en zichtbaar resultaat op te bouwen',
+      'Direct contact met je trainer als je vragen hebt of vastloopt',
+      'Een app waarin je ook je voeding en voortgang kunt bijhouden',
     ],
     outcome:
-      'Je maakt sporten weer haalbaar, zodat je ook met een volle agenda aan een fitter en sterker lichaam kunt werken.',
+      'Je maakt van sporten weer iets haalbaars, zodat je niet blijft uitstellen maar echt gaat voelen wat regelmaat en resultaat met je doen.',
     story:
-      'Bij My Humble Program werk je zelfstandig aan je doelen met een aanpak die juist is gemaakt voor mensen die steeds vastlopen op tijd, structuur, motivatie of resultaat. In de app krijg je direct toegang tot duidelijke video trainingen die je overal kunt volgen. De sessies duren maximaal 45 minuten, zodat sporten ook haalbaar blijft als je agenda vol zit. In dezelfde app houd je je voeding bij en blijf je in contact met je trainer. Dit pakket is nieuw binnen My Humble en is gemaakt om de drempels weg te halen die mensen vaak tegenhouden om echt vol te houden.',
+      'Bij My Humble Program haal je de drempels weg die normaal in de weg zitten. Je krijgt korte, duidelijke trainingen die je overal kunt doen, zonder dat je uren hoeft vrij te maken of eerst zelf een plan moet bedenken. In de app staat alles voor je klaar en blijf je in contact met je trainer. Dit pakket is gemaakt voor mensen die willen stoppen met uitstellen en een manier zoeken die echt in hun leven past.',
     isNew: true,
   },
 ];
