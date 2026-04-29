@@ -135,14 +135,24 @@ function FaqSection() {
   const [direction, setDirection] = useState(1);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
+  const activateFaq = (index: number, source: 'dots' | 'buttons' | 'swipe' | 'arrows') => {
+    setDirection(index > activeFaq ? 1 : -1);
+    setActiveFaq(index);
+    trackEvent('faq_question_viewed', {
+      faq_question: faqs[index]?.question,
+      faq_index: index + 1,
+      faq_source: source,
+    });
+  };
+
   const previousFaq = () => {
-    setDirection(-1);
-    setActiveFaq((current) => (current === 0 ? faqs.length - 1 : current - 1));
+    const nextIndex = activeFaq === 0 ? faqs.length - 1 : activeFaq - 1;
+    activateFaq(nextIndex, 'arrows');
   };
 
   const nextFaq = () => {
-    setDirection(1);
-    setActiveFaq((current) => (current === faqs.length - 1 ? 0 : current + 1));
+    const nextIndex = activeFaq === faqs.length - 1 ? 0 : activeFaq + 1;
+    activateFaq(nextIndex, 'arrows');
   };
 
   const currentItem = faqs[activeFaq];
@@ -159,9 +169,11 @@ function FaqSection() {
 
     if (Math.abs(deltaX) > 50) {
       if (deltaX < 0) {
-        nextFaq();
+        const nextIndex = activeFaq === faqs.length - 1 ? 0 : activeFaq + 1;
+        activateFaq(nextIndex, 'swipe');
       } else {
-        previousFaq();
+        const nextIndex = activeFaq === 0 ? faqs.length - 1 : activeFaq - 1;
+        activateFaq(nextIndex, 'swipe');
       }
     }
 
@@ -206,10 +218,7 @@ function FaqSection() {
               <button
                 key={item.question}
                 type="button"
-                onClick={() => {
-                  setDirection(index > activeFaq ? 1 : -1);
-                  setActiveFaq(index);
-                }}
+                onClick={() => activateFaq(index, 'buttons')}
                 className={cn(
                   'shrink-0 rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] transition sm:text-[11px]',
                   activeFaq === index
@@ -256,10 +265,7 @@ function FaqSection() {
                   <button
                     key={item.question}
                     type="button"
-                    onClick={() => {
-                      setDirection(index > activeFaq ? 1 : -1);
-                      setActiveFaq(index);
-                    }}
+                    onClick={() => activateFaq(index, 'dots')}
                     aria-label={`Ga naar vraag ${index + 1}`}
                     className={cn(
                       'h-2.5 rounded-full transition-all',
@@ -361,6 +367,67 @@ export default function SportLandingPage() {
       trackEvent('privacy_opened');
     }
   }, [privacyOpen]);
+
+  useEffect(() => {
+    const milestones = [25, 50, 75, 100];
+    const reached = new Set<number>();
+
+    function handleScrollDepth() {
+      const doc = document.documentElement;
+      const total = doc.scrollHeight - window.innerHeight;
+      if (total <= 0) return;
+
+      const progress = Math.min(100, Math.round((window.scrollY / total) * 100));
+
+      milestones.forEach((milestone) => {
+        if (progress >= milestone && !reached.has(milestone)) {
+          reached.add(milestone);
+          trackEvent('scroll_depth_reached', { scroll_depth: milestone });
+        }
+      });
+    }
+
+    handleScrollDepth();
+    window.addEventListener('scroll', handleScrollDepth, { passive: true });
+    return () => window.removeEventListener('scroll', handleScrollDepth);
+  }, []);
+
+  useEffect(() => {
+    const sectionElements = Array.from(document.querySelectorAll<HTMLElement>('section[id]'));
+    if (!sectionElements.length) return;
+
+    const viewedSections = new Set<string>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const sectionId = entry.target.getAttribute('id');
+            if (sectionId && !viewedSections.has(sectionId)) {
+              viewedSections.add(sectionId);
+              trackEvent('section_in_view', { section_name: sectionId });
+            }
+          }
+        });
+      },
+      { threshold: 0.45 },
+    );
+
+    sectionElements.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const timers = [30, 60, 120];
+    const timeoutIds = timers.map((seconds) =>
+      window.setTimeout(() => {
+        trackEvent('engaged_time_reached', { engaged_seconds: seconds });
+      }, seconds * 1000),
+    );
+
+    return () => {
+      timeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId));
+    };
+  }, []);
 
   async function submitLead(answers: QuizAnswers) {
     try {

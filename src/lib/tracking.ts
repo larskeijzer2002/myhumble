@@ -1,5 +1,6 @@
 const ATTRIBUTION_STORAGE_KEY = 'myhumble_attribution';
 const SESSION_STORAGE_KEY = 'myhumble_session_id';
+const DEFAULT_GA4_MEASUREMENT_ID = 'G-L1LPXCC1P9';
 
 type AttributionData = {
   first_visit_at?: string;
@@ -19,7 +20,7 @@ type AttributionData = {
 type TrackParams = Record<string, string | number | boolean | undefined>;
 
 function getGaId() {
-  return import.meta.env.VITE_GA4_MEASUREMENT_ID?.trim() || '';
+  return import.meta.env.VITE_GA4_MEASUREMENT_ID?.trim() || DEFAULT_GA4_MEASUREMENT_ID;
 }
 
 function getClarityId() {
