@@ -183,33 +183,59 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
 
         <div className="overflow-hidden rounded-[1.9rem] border border-white/10 bg-white/[0.03]">
           <div className="relative border-b border-white/10">
-            <img src={activePackage.image} alt={activePackage.title} className="h-56 w-full object-cover sm:h-80 lg:h-[24rem]" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
+            <img src={activePackage.image} alt={activePackage.title} className="h-44 w-full object-cover sm:h-80 lg:h-[24rem]" />
+            <div className="absolute inset-0 hidden bg-gradient-to-t from-black via-black/45 to-black/10 sm:block" />
             {activePackage.isNew ? (
-              <div className="absolute right-5 top-5 inline-flex items-center gap-2 rounded-full border border-[#2872fa]/35 bg-black/65 px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.24em] text-white shadow-[0_0_30px_rgba(40,114,250,0.24)] backdrop-blur-md">
-                <span className="relative flex h-2.5 w-2.5">
+              <div className="absolute right-5 top-5 hidden items-center gap-2 rounded-full border border-[#2872fa]/35 bg-black/65 px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.24em] text-white shadow-[0_0_24px_rgba(40,114,250,0.24)] backdrop-blur-md sm:inline-flex">
+                <span className="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#2872fa] opacity-75" />
-                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#2872fa]" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#2872fa] sm:h-2.5 sm:w-2.5" />
                 </span>
                 Nieuw traject
               </div>
             ) : null}
-            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-8 lg:p-10">
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="rounded-full border border-[#2872fa]/30 bg-[#2872fa]/12 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#2872fa] sm:text-[11px]">
+            <div className="hidden absolute inset-x-0 bottom-0 sm:block sm:p-8 lg:p-10">
+              <div className="flex flex-wrap items-start gap-2 sm:items-center sm:gap-3">
+                <div className="rounded-full border border-[#2872fa]/30 bg-[#2872fa]/12 px-4 py-2 text-[11px] font-black uppercase tracking-[0.2em] text-[#2872fa]">
                   {flowCopy.badge}
                 </div>
-                <div className="rounded-full border border-white/10 bg-black/45 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-white/70 sm:text-[11px]">
+                <div className="rounded-full border border-white/10 bg-black/45 px-4 py-2 text-[11px] font-black uppercase tracking-[0.2em] text-white/70">
                   14 dagen gratis proberen
                 </div>
               </div>
-              <h3 className="mt-4 max-w-3xl text-[1.9rem] font-black uppercase leading-[1.02] text-white sm:text-5xl">
+              <h3 className="mt-4 max-w-3xl text-5xl font-black uppercase leading-[1.02] text-white">
                 {activePackage.title}
               </h3>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/78 sm:text-lg sm:leading-8">
+              <p className="mt-3 max-w-2xl text-lg leading-8 text-white/78">
                 {activePackage.description}
               </p>
             </div>
+          </div>
+
+          <div className="border-b border-white/10 p-4 sm:hidden">
+            <div className="flex flex-wrap items-start gap-2">
+              {activePackage.isNew ? (
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#2872fa]/35 bg-black/65 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.16em] text-white shadow-[0_0_24px_rgba(40,114,250,0.24)] backdrop-blur-md">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#2872fa] opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-[#2872fa]" />
+                  </span>
+                  Nieuw traject
+                </div>
+              ) : null}
+              <div className="rounded-full border border-[#2872fa]/30 bg-[#2872fa]/12 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.16em] text-[#2872fa]">
+                {flowCopy.badge}
+              </div>
+              <div className="rounded-full border border-white/10 bg-black/45 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.16em] text-white/70">
+                14 dagen gratis proberen
+              </div>
+            </div>
+            <h3 className="mt-4 max-w-[16rem] text-[1.55rem] font-black uppercase leading-[0.98] text-white">
+              {activePackage.title}
+            </h3>
+            <p className="mt-3 max-w-[19rem] text-[13px] leading-6 text-white/80">
+              {activePackage.description}
+            </p>
           </div>
 
           <div className="p-4 sm:p-8 lg:p-10">
@@ -342,7 +368,12 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
   return (
     <div className="space-y-4">
       {packages.map((pkg) => (
-        <div key={pkg.key} className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-black/60 transition hover:border-[#2872fa]">
+        <button
+          key={pkg.key}
+          type="button"
+          onClick={() => onOpenPackage(pkg.key)}
+          className="block w-full overflow-hidden rounded-[1.75rem] border border-white/10 bg-black/60 text-left transition hover:border-[#2872fa]"
+        >
           <div className="relative">
             <img src={pkg.image} alt={pkg.title} className="h-52 w-full object-cover" />
             {pkg.isNew ? (
@@ -366,7 +397,8 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
               </div>
               <button
                 type="button"
-                onClick={() => {
+                onClick={(event) => {
+                  event.stopPropagation();
                   trackEvent('package_selected', { package_name: pkg.key });
                   if (pkg.key === 'training') {
                     onOpenPackage(pkg.key);
@@ -382,7 +414,7 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
               </button>
             </div>
           </div>
-        </div>
+        </button>
       ))}
     </div>
   );
@@ -461,6 +493,17 @@ export function QuizModal({ isOpen, steps, startAtPackages = false, onClose, onS
 
   const activePackage = useMemo(() => packages.find((pkg) => pkg.key === selectedPackage) || null, [selectedPackage]);
 
+  useEffect(() => {
+    if (!isOpen || !activePackage) return;
+
+    window.requestAnimationFrame(() => {
+      const modalContent = document.querySelector('[data-quiz-modal-content]');
+      if (modalContent instanceof HTMLElement) {
+        modalContent.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+  }, [isOpen, activePackage]);
+
   if (!isOpen) {
     return null;
   }
@@ -518,7 +561,10 @@ export function QuizModal({ isOpen, steps, startAtPackages = false, onClose, onS
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-3 py-3 backdrop-blur-sm sm:px-4 sm:py-6">
-      <div className="relative max-h-[96vh] w-full max-w-5xl overflow-y-auto rounded-[1.75rem] border border-white/10 bg-[#050505] p-5 shadow-2xl sm:max-h-[92vh] sm:rounded-[2rem] sm:p-8 lg:p-10">
+      <div
+        data-quiz-modal-content
+        className="relative max-h-[96vh] w-full max-w-5xl overflow-y-auto rounded-[1.75rem] border border-white/10 bg-[#050505] p-5 shadow-2xl sm:max-h-[92vh] sm:rounded-[2rem] sm:p-8 lg:p-10"
+      >
         <button
           type="button"
           onClick={onClose}
