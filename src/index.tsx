@@ -133,7 +133,7 @@ function ReviewsSection() {
 function FaqSection() {
   const [activeFaq, setActiveFaq] = useState(0);
   const [direction, setDirection] = useState(1);
-  const faqHighlights = ['Intake via quiz', 'App ondersteuning', 'Training, Online of Program'];
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
   const previousFaq = () => {
     setDirection(-1);
@@ -146,6 +146,27 @@ function FaqSection() {
   };
 
   const currentItem = faqs[activeFaq];
+
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    setTouchStartX(event.changedTouches[0]?.clientX ?? null);
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (touchStartX === null) return;
+
+    const touchEndX = event.changedTouches[0]?.clientX ?? touchStartX;
+    const deltaX = touchEndX - touchStartX;
+
+    if (Math.abs(deltaX) > 50) {
+      if (deltaX < 0) {
+        nextFaq();
+      } else {
+        previousFaq();
+      }
+    }
+
+    setTouchStartX(null);
+  };
 
   return (
     <section id="faq" className="border-y border-white/10 bg-white/[0.03]">
@@ -180,18 +201,32 @@ function FaqSection() {
             </div>
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-3">
-            {faqHighlights.map((item) => (
-              <div
-                key={item}
-                className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-white/55 sm:text-[11px]"
+          <div className="scrollbar-none mt-6 flex gap-3 overflow-x-auto pb-1">
+            {faqs.map((item, index) => (
+              <button
+                key={item.question}
+                type="button"
+                onClick={() => {
+                  setDirection(index > activeFaq ? 1 : -1);
+                  setActiveFaq(index);
+                }}
+                className={cn(
+                  'shrink-0 rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] transition sm:text-[11px]',
+                  activeFaq === index
+                    ? 'border-[#2872fa] bg-[#2872fa] text-white'
+                    : 'border-white/10 bg-white/[0.03] text-white/55 hover:border-white/25 hover:text-white',
+                )}
               >
-                {item}
-              </div>
+                {item.question}
+              </button>
             ))}
           </div>
 
-          <div className="relative mt-8 overflow-hidden rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-white/[0.05] via-black/70 to-black p-6 sm:p-8">
+          <div
+            className="relative mt-8 overflow-hidden rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-white/[0.05] via-black/70 to-black p-6 sm:p-8"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(40,114,250,0.16),_transparent_34%)]" />
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#2872fa]/50 to-transparent" />
             <AnimatePresence mode="wait" initial={false}>
@@ -239,26 +274,6 @@ function FaqSection() {
             </div>
           </div>
 
-          <div className="scrollbar-none mt-6 flex gap-3 overflow-x-auto pb-1">
-            {faqs.map((item, index) => (
-              <button
-                key={item.question}
-                type="button"
-                onClick={() => {
-                  setDirection(index > activeFaq ? 1 : -1);
-                  setActiveFaq(index);
-                }}
-                className={cn(
-                  'shrink-0 rounded-full border px-4 py-3 text-[10px] font-black uppercase tracking-[0.14em] transition sm:text-[11px] sm:tracking-[0.16em]',
-                  activeFaq === index
-                    ? 'border-[#2872fa] bg-[#2872fa] text-white'
-                    : 'border-white/10 bg-white/[0.03] text-white/60 hover:border-white/25 hover:text-white',
-                )}
-              >
-                {item.question}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
     </section>

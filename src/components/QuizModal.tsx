@@ -285,25 +285,6 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
               </FunnelStep>
             </div>
 
-            <div className="mt-4 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-              <div className="rounded-[1.55rem] border border-white/10 bg-gradient-to-br from-[#2872fa]/12 via-[#080d16] to-black p-5 sm:p-6">
-                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#2872fa]">Wat dit je oplevert</p>
-                <p className="mt-3 text-[15px] leading-7 text-white/82 sm:text-base sm:leading-8">{activePackage.outcome}</p>
-              </div>
-
-              <div className="rounded-[1.55rem] border border-white/10 bg-black/40 p-5 sm:p-6">
-                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-white/52">Zo gaat het verder</p>
-                <div className="mt-3 space-y-2.5">
-                  {flowCopy.after.map((item) => (
-                    <div key={item} className="flex items-start gap-3">
-                      <div className="mt-2 h-1.5 w-1.5 rounded-full bg-[#2872fa]" />
-                      <p className="text-sm leading-6 text-white/72">{item}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
             <div className="mt-4 rounded-[1.7rem] border border-white/10 bg-gradient-to-br from-white/[0.04] via-black/80 to-black p-5 sm:p-6">
               <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                 <div className="max-w-xl">
@@ -330,6 +311,25 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
                   >
                     Bekijk andere pakketten
                   </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+              <div className="rounded-[1.55rem] border border-white/10 bg-gradient-to-br from-[#2872fa]/12 via-[#080d16] to-black p-5 sm:p-6">
+                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#2872fa]">Wat dit je oplevert</p>
+                <p className="mt-3 text-[15px] leading-7 text-white/82 sm:text-base sm:leading-8">{activePackage.outcome}</p>
+              </div>
+
+              <div className="rounded-[1.55rem] border border-white/10 bg-black/40 p-5 sm:p-6">
+                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-white/52">Zo gaat het verder</p>
+                <div className="mt-3 space-y-2.5">
+                  {flowCopy.after.map((item) => (
+                    <div key={item} className="flex items-start gap-3">
+                      <div className="mt-2 h-1.5 w-1.5 rounded-full bg-[#2872fa]" />
+                      <p className="text-sm leading-6 text-white/72">{item}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
