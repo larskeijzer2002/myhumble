@@ -7,6 +7,7 @@ import { IconInstagram, IconLinkedIn, IconTikTok } from './icons';
 type FooterProps = {
   onOpenQuiz: () => void;
   onOpenPrivacy: () => void;
+  onOpenConsent: () => void;
 };
 
 type SocialButtonProps = {
@@ -35,7 +36,7 @@ function SocialButton({ href, label, children, highlighted = false }: SocialButt
   );
 }
 
-export function Footer({ onOpenQuiz, onOpenPrivacy }: FooterProps) {
+export function Footer({ onOpenQuiz, onOpenPrivacy, onOpenConsent }: FooterProps) {
   return (
     <footer className="relative overflow-hidden bg-white/[0.02] px-4 pb-8 pt-4 sm:px-6 sm:pb-10 sm:pt-6 md:px-10 lg:px-16">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_rgba(40,114,250,0.18),_transparent_28%)]" />
@@ -105,6 +106,9 @@ export function Footer({ onOpenQuiz, onOpenPrivacy }: FooterProps) {
           <div className="flex flex-wrap gap-5">
             <button type="button" onClick={onOpenPrivacy} className="transition hover:text-white/60">
               Privacy
+            </button>
+            <button type="button" onClick={onOpenConsent} className="transition hover:text-white/60">
+              Cookies
             </button>
             <a href="#faq" className="transition hover:text-white/60">Terms</a>
             <a href="#faq" className="transition hover:text-white/60">Support</a>

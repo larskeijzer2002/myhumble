@@ -1,5 +1,6 @@
 const ATTRIBUTION_STORAGE_KEY = 'myhumble_attribution';
 const SESSION_STORAGE_KEY = 'myhumble_session_id';
+const CONSENT_STORAGE_KEY = 'myhumble_consent_preferences';
 const DEFAULT_GA4_MEASUREMENT_ID = 'G-L1LPXCC1P9';
 
 type AttributionData = {
@@ -19,6 +20,11 @@ type AttributionData = {
 
 type TrackParams = Record<string, string | number | boolean | undefined>;
 
+export type ConsentPreferences = {
+  analytics: boolean;
+  updatedAt: string;
+};
+
 function getGaId() {
   return import.meta.env.VITE_GA4_MEASUREMENT_ID?.trim() || DEFAULT_GA4_MEASUREMENT_ID;
 }
@@ -29,6 +35,13 @@ function getClarityId() {
 
 function isBrowser() {
   return typeof window !== 'undefined';
+}
+
+function getDefaultConsentPreferences(): ConsentPreferences {
+  return {
+    analytics: false,
+    updatedAt: '',
+  };
 }
 
 function createSessionId() {
@@ -50,6 +63,56 @@ export function getStoredAttribution(): AttributionData {
     return JSON.parse(window.localStorage.getItem(ATTRIBUTION_STORAGE_KEY) || '{}') as AttributionData;
   } catch {
     return {};
+  }
+}
+
+export function getConsentPreferences(): ConsentPreferences {
+  if (!isBrowser()) return getDefaultConsentPreferences();
+
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(CONSENT_STORAGE_KEY) || '{}') as Partial<ConsentPreferences>;
+    return {
+      analytics: Boolean(parsed.analytics),
+      updatedAt: parsed.updatedAt || '',
+    };
+  } catch {
+    return getDefaultConsentPreferences();
+  }
+}
+
+export function hasConsentChoice() {
+  if (!isBrowser()) return false;
+  return Boolean(window.localStorage.getItem(CONSENT_STORAGE_KEY));
+}
+
+export function hasAnalyticsConsent() {
+  return getConsentPreferences().analytics;
+}
+
+function updateGoogleConsent(analyticsGranted: boolean) {
+  if (!isBrowser() || !window.gtag) return;
+
+  window.gtag('consent', 'update', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: analyticsGranted ? 'granted' : 'denied',
+  });
+}
+
+export function setConsentPreferences(preferences: Pick<ConsentPreferences, 'analytics'>) {
+  if (!isBrowser()) return;
+
+  const nextPreferences: ConsentPreferences = {
+    analytics: preferences.analytics,
+    updatedAt: new Date().toISOString(),
+  };
+
+  window.localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(nextPreferences));
+  updateGoogleConsent(nextPreferences.analytics);
+
+  if (nextPreferences.analytics) {
+    injectClarity();
   }
 }
 
@@ -100,15 +163,23 @@ function injectGa() {
     window.dataLayer?.push(args);
   };
 
+  window.gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied',
+    wait_for_update: 500,
+  });
   window.gtag('js', new Date());
   window.gtag('config', gaId, {
     send_page_view: false,
   });
+  updateGoogleConsent(hasAnalyticsConsent());
 }
 
 function injectClarity() {
   const clarityId = getClarityId();
-  if (!clarityId || !isBrowser() || window.clarity) return;
+  if (!clarityId || !isBrowser() || window.clarity || !hasAnalyticsConsent()) return;
 
   const clarity = ((...args: unknown[]) => {
     clarity.q = clarity.q || [];
@@ -128,11 +199,13 @@ export function initTracking() {
   captureAttribution();
   getSessionId();
   injectGa();
-  injectClarity();
+  if (hasAnalyticsConsent()) {
+    injectClarity();
+  }
 }
 
 export function trackEvent(eventName: string, params: TrackParams = {}) {
-  if (!isBrowser()) return;
+  if (!isBrowser() || !hasAnalyticsConsent()) return;
 
   const cleanParams = Object.fromEntries(
     Object.entries({
@@ -148,7 +221,7 @@ export function trackEvent(eventName: string, params: TrackParams = {}) {
 }
 
 export function trackPageView(pageName?: string) {
-  if (!isBrowser()) return;
+  if (!isBrowser() || !hasAnalyticsConsent()) return;
 
   const pagePath = `${window.location.pathname}${window.location.hash}`;
   const pageTitle = pageName || document.title;

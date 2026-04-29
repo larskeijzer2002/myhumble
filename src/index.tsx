@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
+import { ConsentBanner } from './components/ConsentBanner';
 import { Footer } from './components/Footer';
 import { Hero } from './components/Hero';
 import { NavBar } from './components/NavBar';
@@ -8,7 +9,7 @@ import { PrivacyOverlay } from './components/PrivacyOverlay';
 import { QuizModal } from './components/QuizModal';
 import { SectionHeader } from './components/SectionHeader';
 import { benefits, COMPANY_EMAIL, faqs, IMAGES, pillars, quizSteps, testimonials, WEB3FORMS_KEY, type PackageKey, type QuizAnswers, type TrainingFrequencyKey } from './data/siteContent';
-import { trackEvent, trackPageView } from './lib/tracking';
+import { getConsentPreferences, hasConsentChoice, setConsentPreferences, trackEvent, trackPageView, type ConsentPreferences } from './lib/tracking';
 import { cn, primaryButtonClass } from './lib/utils';
 
 function Reveal({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
@@ -322,6 +323,9 @@ export default function SportLandingPage() {
   const [quizOpen, setQuizOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [startAtPackages, setStartAtPackages] = useState(false);
+  const [consentOpen, setConsentOpen] = useState(false);
+  const [consentManageOpen, setConsentManageOpen] = useState(false);
+  const [consentPreferences, setConsentPreferencesState] = useState<ConsentPreferences>(() => getConsentPreferences());
   const [packageNotice, setPackageNotice] = useState<{
     type: 'success' | 'error';
     title: string;
@@ -329,6 +333,14 @@ export default function SportLandingPage() {
     actionLabel?: string;
     actionHref?: string;
   } | null>(null);
+
+  useEffect(() => {
+    if (!hasConsentChoice()) {
+      setConsentOpen(true);
+    } else {
+      setConsentPreferencesState(getConsentPreferences());
+    }
+  }, []);
 
   useEffect(() => {
     function handleRouteTracking() {
@@ -367,6 +379,20 @@ export default function SportLandingPage() {
       trackEvent('privacy_opened');
     }
   }, [privacyOpen]);
+
+  function handleConsentUpdate(analytics: boolean) {
+    setConsentPreferences({ analytics });
+    const nextPreferences = getConsentPreferences();
+    setConsentPreferencesState(nextPreferences);
+    setConsentOpen(false);
+    setConsentManageOpen(false);
+    trackEvent('consent_updated', {
+      analytics_enabled: analytics,
+    });
+    if (analytics) {
+      trackPageView('My Humble');
+    }
+  }
 
   useEffect(() => {
     const milestones = [25, 50, 75, 100];
@@ -596,6 +622,7 @@ export default function SportLandingPage() {
           setQuizOpen(true);
         }}
         onOpenPrivacy={() => setPrivacyOpen(true)}
+        onOpenConsent={() => setConsentManageOpen(true)}
       />
 
       <AnimatePresence>
@@ -615,6 +642,16 @@ export default function SportLandingPage() {
       </AnimatePresence>
 
       <AnimatePresence>{privacyOpen ? <PrivacyOverlay onClose={() => setPrivacyOpen(false)} /> : null}</AnimatePresence>
+
+      <ConsentBanner
+        isOpen={consentOpen || consentManageOpen}
+        isManageMode={consentManageOpen}
+        initialPreferences={consentPreferences}
+        onAcceptAnalytics={() => handleConsentUpdate(true)}
+        onRejectAnalytics={() => handleConsentUpdate(false)}
+        onSavePreferences={(preferences) => handleConsentUpdate(preferences.analytics)}
+        onCloseManage={() => setConsentManageOpen(false)}
+      />
 
       <AnimatePresence>
         {packageNotice ? (
