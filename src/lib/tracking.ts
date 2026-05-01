@@ -151,17 +151,14 @@ export function captureAttribution() {
 
 function injectGa() {
   const gaId = getGaId();
-  if (!gaId || !isBrowser() || window.gtag) return;
-
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
-  document.head.appendChild(script);
+  if (!gaId || !isBrowser()) return;
 
   window.dataLayer = window.dataLayer || [];
-  window.gtag = function gtag(...args: unknown[]) {
-    window.dataLayer?.push(args);
-  };
+  if (!window.gtag) {
+    window.gtag = function gtag(...args: unknown[]) {
+      window.dataLayer?.push(args);
+    };
+  }
 
   window.gtag('consent', 'default', {
     ad_storage: 'denied',
@@ -169,10 +166,6 @@ function injectGa() {
     ad_personalization: 'denied',
     analytics_storage: 'denied',
     wait_for_update: 500,
-  });
-  window.gtag('js', new Date());
-  window.gtag('config', gaId, {
-    send_page_view: false,
   });
   updateGoogleConsent(hasAnalyticsConsent());
 }
