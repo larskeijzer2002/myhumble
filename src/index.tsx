@@ -12,6 +12,29 @@ import { benefits, COMPANY_EMAIL, faqs, IMAGES, pillars, quizSteps, testimonials
 import { getConsentPreferences, hasConsentChoice, setConsentPreferences, trackEvent, trackPageView, type ConsentPreferences } from './lib/tracking';
 import { cn, primaryButtonClass } from './lib/utils';
 
+function sanitizeText(value: string, maxLength = 200) {
+  return value.replace(/[\r\n\t]+/g, ' ').replace(/\s{2,}/g, ' ').trim().slice(0, maxLength);
+}
+
+function sanitizePhone(value: string) {
+  return value.replace(/[^\d+]/g, '').slice(0, 20);
+}
+
+function sanitizeSubmissionAnswers(answers: QuizAnswers): QuizAnswers {
+  return {
+    ...answers,
+    firstName: sanitizeText(answers.firstName, 80),
+    email: sanitizeText(answers.email, 120).toLowerCase(),
+    phone: sanitizePhone(answers.phone),
+    gender: sanitizeText(answers.gender, 40),
+    height: sanitizeText(answers.height, 10),
+    weight: sanitizeText(answers.weight, 10),
+    goal: sanitizeText(answers.goal, 120),
+    level: sanitizeText(answers.level, 120),
+    commitment: sanitizeText(answers.commitment, 120),
+  };
+}
+
 function Reveal({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
   return (
     <motion.div
@@ -456,6 +479,8 @@ export default function SportLandingPage() {
   }, []);
 
   async function submitLead(answers: QuizAnswers) {
+    const safeAnswers = sanitizeSubmissionAnswers(answers);
+
     try {
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
@@ -464,22 +489,23 @@ export default function SportLandingPage() {
           access_key: WEB3FORMS_KEY,
           subject: 'Nieuwe My Humble trial aanvraag',
           from_name: 'My Humble Website',
-          replyto: answers.email,
-          name: answers.firstName,
-          email: answers.email,
-          phone: answers.phone,
+          replyto: safeAnswers.email,
+          name: safeAnswers.firstName,
+          email: safeAnswers.email,
+          phone: safeAnswers.phone,
           email_to: COMPANY_EMAIL,
+          botcheck: '',
           message:
             `Nieuwe aanvraag voor My Humble.\n\n` +
-            `Naam: ${answers.firstName}\n` +
-            `Email: ${answers.email}\n` +
-            `Telefoon: ${answers.phone}\n\n` +
-            `Geslacht: ${answers.gender}\n` +
-            `Lengte: ${answers.height} cm\n` +
-            `Gewicht: ${answers.weight} kg\n\n` +
-            `Doel: ${answers.goal}\n` +
-            `Niveau: ${answers.level}\n` +
-            `Commitment: ${answers.commitment}`,
+            `Naam: ${safeAnswers.firstName}\n` +
+            `Email: ${safeAnswers.email}\n` +
+            `Telefoon: ${safeAnswers.phone}\n\n` +
+            `Geslacht: ${safeAnswers.gender}\n` +
+            `Lengte: ${safeAnswers.height} cm\n` +
+            `Gewicht: ${safeAnswers.weight} kg\n\n` +
+            `Doel: ${safeAnswers.goal}\n` +
+            `Niveau: ${safeAnswers.level}\n` +
+            `Commitment: ${safeAnswers.commitment}`,
         }),
       });
       const json = (await response.json()) as { success?: boolean };
@@ -492,7 +518,9 @@ export default function SportLandingPage() {
   }
 
   async function goToStripe(packageKey: PackageKey, answers: QuizAnswers, trainingFrequency?: TrainingFrequencyKey) {
-    if (!answers.firstName || !answers.email || !answers.phone) {
+    const safeAnswers = sanitizeSubmissionAnswers(answers);
+
+    if (!safeAnswers.firstName || !safeAnswers.email || !safeAnswers.phone) {
       setPackageNotice({
         type: 'error',
         title: 'Vul eerst je intake in',
@@ -524,29 +552,34 @@ export default function SportLandingPage() {
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
           access_key: WEB3FORMS_KEY,
-          subject: `${packageLabel} contactverzoek`,
-          from_name: 'My Humble Website',
-          replyto: answers.email,
-          name: answers.firstName,
-          email: answers.email,
-          phone: answers.phone,
+          subject: `[Pakketaanvraag] ${packageLabel}${frequencyLabel ? ` - ${frequencyLabel}` : ''}`,
+          from_name: `${packageLabel} aanvraag`,
+          replyto: safeAnswers.email,
+          name: safeAnswers.firstName,
+          email: safeAnswers.email,
+          phone: safeAnswers.phone,
           email_to: COMPANY_EMAIL,
           package_name: packageLabel,
           training_frequency: frequencyLabel,
+          botcheck: '',
           message:
-            `Nieuwe aanvraag voor ${packageLabel}.\n\n` +
+            `PAKKETGEKOZEN\n` +
+            `====================\n` +
             `Pakket: ${packageLabel}\n` +
             (frequencyLabel ? `Trainingsfrequentie: ${frequencyLabel}\n` : '') +
-            `\n` +
-            `Naam: ${answers.firstName}\n` +
-            `Email: ${answers.email}\n` +
-            `Telefoon: ${answers.phone}\n\n` +
-            `Geslacht: ${answers.gender}\n` +
-            `Lengte: ${answers.height} cm\n` +
-            `Gewicht: ${answers.weight} kg\n\n` +
-            `Doel: ${answers.goal}\n` +
-            `Niveau: ${answers.level}\n` +
-            `Commitment: ${answers.commitment}\n` +
+            `====================\n\n` +
+            `CONTACTGEGEVENS\n` +
+            `Naam: ${safeAnswers.firstName}\n` +
+            `Email: ${safeAnswers.email}\n` +
+            `Telefoon: ${safeAnswers.phone}\n\n` +
+            `PROFIEL\n` +
+            `Geslacht: ${safeAnswers.gender}\n` +
+            `Lengte: ${safeAnswers.height} cm\n` +
+            `Gewicht: ${safeAnswers.weight} kg\n\n` +
+            `INTAKE\n` +
+            `Doel: ${safeAnswers.goal}\n` +
+            `Niveau: ${safeAnswers.level}\n` +
+            `Commitment: ${safeAnswers.commitment}\n` +
             `\nActie: Bezoeker heeft gekozen voor ${packageLabel} en verwacht contact van een trainer.`,
         }),
       });
