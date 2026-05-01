@@ -100,6 +100,20 @@ function updateGoogleConsent(analyticsGranted: boolean) {
   });
 }
 
+function sendGooglePageConfig(pageTitle?: string) {
+  if (!isBrowser() || !window.gtag) return;
+
+  const gaId = getGaId();
+  if (!gaId) return;
+
+  window.gtag('config', gaId, {
+    page_title: pageTitle || document.title,
+    page_path: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+    page_location: window.location.href,
+    send_page_view: true,
+  });
+}
+
 export function setConsentPreferences(preferences: Pick<ConsentPreferences, 'analytics'>) {
   if (!isBrowser()) return;
 
@@ -112,6 +126,7 @@ export function setConsentPreferences(preferences: Pick<ConsentPreferences, 'ana
   updateGoogleConsent(nextPreferences.analytics);
 
   if (nextPreferences.analytics) {
+    sendGooglePageConfig();
     injectClarity();
   }
 }
@@ -219,10 +234,13 @@ export function trackPageView(pageName?: string) {
   const pagePath = `${window.location.pathname}${window.location.hash}`;
   const pageTitle = pageName || document.title;
 
+  sendGooglePageConfig(pageTitle);
+
   if (window.gtag) {
     window.gtag('event', 'page_view', {
       page_title: pageTitle,
       page_path: pagePath,
+      page_location: window.location.href,
       session_id: getSessionId(),
       ...getStoredAttribution(),
     });
