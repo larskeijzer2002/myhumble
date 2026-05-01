@@ -9,7 +9,7 @@ import { PrivacyOverlay } from './components/PrivacyOverlay';
 import { QuizModal } from './components/QuizModal';
 import { SectionHeader } from './components/SectionHeader';
 import { benefits, COMPANY_EMAIL, faqs, IMAGES, pillars, quizSteps, testimonials, WEB3FORMS_KEY, type PackageKey, type QuizAnswers, type TrainingFrequencyKey } from './data/siteContent';
-import { getConsentPreferences, hasConsentChoice, setConsentPreferences, trackEvent, trackPageView, type ConsentPreferences } from './lib/tracking';
+import { getConsentPreferences, hasConsentChoice, setConsentPreferences, trackEvent, trackPageView, triggerInitialAnalyticsHit, type ConsentPreferences } from './lib/tracking';
 import { cn, primaryButtonClass } from './lib/utils';
 
 function sanitizeText(value: string, maxLength = 200) {
@@ -413,10 +413,7 @@ export default function SportLandingPage() {
       analytics_enabled: analytics,
     });
     if (analytics) {
-      trackPageView('My Humble');
-      trackEvent('analytics_test_hit', {
-        source: 'consent_accept',
-      });
+      triggerInitialAnalyticsHit('My Humble');
     }
   }
 

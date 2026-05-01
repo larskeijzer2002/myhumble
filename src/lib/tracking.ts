@@ -256,6 +256,35 @@ export function trackPageView(pageName?: string) {
   }
 }
 
+export function triggerInitialAnalyticsHit(pageName?: string) {
+  if (!isBrowser() || !hasAnalyticsConsent()) return;
+
+  window.setTimeout(() => {
+    if (!hasAnalyticsConsent()) return;
+
+    const pageTitle = pageName || document.title;
+    sendGooglePageConfig(pageTitle);
+
+    if (window.gtag) {
+      window.gtag('event', 'page_view', {
+        page_title: pageTitle,
+        page_path: `${window.location.pathname}${window.location.hash}`,
+        page_location: window.location.href,
+        session_id: getSessionId(),
+        debug_mode: isGaDebugMode(),
+        ...getStoredAttribution(),
+      });
+
+      window.gtag('event', 'analytics_test_hit', {
+        source: 'consent_accept',
+        session_id: getSessionId(),
+        debug_mode: isGaDebugMode(),
+        ...getStoredAttribution(),
+      });
+    }
+  }, 800);
+}
+
 export function buildTrackedStripeUrl(url: string, params: TrackParams = {}) {
   const trackedUrl = new URL(url);
   const attribution = getStoredAttribution();
