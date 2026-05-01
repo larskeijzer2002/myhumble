@@ -37,6 +37,12 @@ function isBrowser() {
   return typeof window !== 'undefined';
 }
 
+function isGaDebugMode() {
+  if (!isBrowser()) return false;
+  const url = new URL(window.location.href);
+  return url.searchParams.get('ga_debug') === '1' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+}
+
 function getDefaultConsentPreferences(): ConsentPreferences {
   return {
     analytics: false,
@@ -111,6 +117,7 @@ function sendGooglePageConfig(pageTitle?: string) {
     page_path: `${window.location.pathname}${window.location.search}${window.location.hash}`,
     page_location: window.location.href,
     send_page_view: true,
+    debug_mode: isGaDebugMode(),
   });
 }
 
@@ -219,6 +226,7 @@ export function trackEvent(eventName: string, params: TrackParams = {}) {
     Object.entries({
       ...getStoredAttribution(),
       session_id: getSessionId(),
+      debug_mode: isGaDebugMode(),
       ...params,
     }).filter(([, value]) => value !== undefined && value !== ''),
   );
@@ -242,6 +250,7 @@ export function trackPageView(pageName?: string) {
       page_path: pagePath,
       page_location: window.location.href,
       session_id: getSessionId(),
+      debug_mode: isGaDebugMode(),
       ...getStoredAttribution(),
     });
   }

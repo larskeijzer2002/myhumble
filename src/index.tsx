@@ -414,6 +414,9 @@ export default function SportLandingPage() {
     });
     if (analytics) {
       trackPageView('My Humble');
+      trackEvent('analytics_test_hit', {
+        source: 'consent_accept',
+      });
     }
   }
 
