@@ -2,6 +2,7 @@ const ATTRIBUTION_STORAGE_KEY = 'myhumble_attribution';
 const SESSION_STORAGE_KEY = 'myhumble_session_id';
 const CONSENT_STORAGE_KEY = 'myhumble_consent_preferences';
 const DEFAULT_GA4_MEASUREMENT_ID = 'G-L1LPXCC1P9';
+const FORCE_ANALYTICS_ALWAYS_ON = true;
 
 type AttributionData = {
   first_visit_at?: string;
@@ -44,12 +45,12 @@ function isGaDebugMode() {
 }
 
 function hasForcedAnalyticsDebugConsent() {
-  return isGaDebugMode();
+  return FORCE_ANALYTICS_ALWAYS_ON || isGaDebugMode();
 }
 
 function getDefaultConsentPreferences(): ConsentPreferences {
   return {
-    analytics: false,
+    analytics: FORCE_ANALYTICS_ALWAYS_ON,
     updatedAt: '',
   };
 }
