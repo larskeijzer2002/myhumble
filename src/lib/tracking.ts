@@ -5,7 +5,6 @@ const SESSION_STORAGE_KEY = 'myhumble_session_id';
 const CONSENT_STORAGE_KEY = 'myhumble_consent_preferences';
 export const APP_ROUTE_CHANGE_EVENT = 'myhumble:routechange';
 const DEFAULT_GA4_MEASUREMENT_ID = 'G-L1LPXCC1P9';
-const DEFAULT_CLARITY_PROJECT_ID = 'wlu4ohzqir';
 const FORCE_ANALYTICS_ALWAYS_ON = false;
 
 type AttributionData = {
@@ -36,10 +35,6 @@ type VirtualRouteOptions = {
 
 function getGaId() {
   return import.meta.env.VITE_GA4_MEASUREMENT_ID?.trim() || DEFAULT_GA4_MEASUREMENT_ID;
-}
-
-function getClarityId() {
-  return import.meta.env.VITE_CLARITY_PROJECT_ID?.trim() || DEFAULT_CLARITY_PROJECT_ID;
 }
 
 function isBrowser() {
@@ -150,7 +145,7 @@ function sendGooglePageConfig(pageTitle?: string) {
     page_title: pageTitle || document.title,
     page_path: `${window.location.pathname}${window.location.search}${window.location.hash}`,
     page_location: window.location.href,
-    send_page_view: true,
+    send_page_view: false,
     debug_mode: isGaDebugMode(),
   });
 }
@@ -168,7 +163,6 @@ export function setConsentPreferences(preferences: Pick<ConsentPreferences, 'ana
 
   if (nextPreferences.analytics) {
     sendGooglePageConfig();
-    injectClarity();
   }
 }
 
@@ -221,31 +215,11 @@ function injectGa() {
   });
 }
 
-function injectClarity() {
-  const clarityId = getClarityId();
-  if (!clarityId || !isBrowser() || window.clarity || !hasAnalyticsConsent()) return;
-
-  const clarity = ((...args: unknown[]) => {
-    clarity.q = clarity.q || [];
-    clarity.q.push(args);
-  }) as ((...args: unknown[]) => void) & { q?: unknown[][] };
-
-  window.clarity = clarity;
-
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = `https://www.clarity.ms/tag/${clarityId}`;
-  document.head.appendChild(script);
-}
-
 export function initTracking() {
   if (!isBrowser()) return;
   captureAttribution();
   getSessionId();
   injectGa();
-  if (hasAnalyticsConsent()) {
-    injectClarity();
-  }
 }
 
 export function trackEvent(eventName: string, params: TrackParams = {}) {
