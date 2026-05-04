@@ -1,3 +1,5 @@
+import { track as trackVercelEvent } from '@vercel/analytics';
+
 const ATTRIBUTION_STORAGE_KEY = 'myhumble_attribution';
 const SESSION_STORAGE_KEY = 'myhumble_session_id';
 const CONSENT_STORAGE_KEY = 'myhumble_consent_preferences';
@@ -251,6 +253,12 @@ export function trackEvent(eventName: string, params: TrackParams = {}) {
 
   if (window.gtag) {
     window.gtag('event', eventName, cleanParams);
+  }
+
+  try {
+    trackVercelEvent(eventName, cleanParams);
+  } catch {
+    // Ignore Vercel Analytics client errors so user flows are never blocked.
   }
 }
 
