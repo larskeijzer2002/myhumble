@@ -102,15 +102,6 @@ export function hasAnalyticsConsent() {
 
 function updateGoogleConsent(analyticsGranted: boolean) {
   if (!isBrowser() || !window.gtag) return;
-
-  const granted = analyticsGranted || hasForcedAnalyticsDebugConsent();
-
-  window.gtag('consent', 'update', {
-    ad_storage: 'denied',
-    ad_user_data: 'denied',
-    ad_personalization: 'denied',
-    analytics_storage: granted ? 'granted' : 'denied',
-  });
 }
 
 function sendGooglePageConfig(pageTitle?: string) {
@@ -188,15 +179,6 @@ function injectGa() {
       window.dataLayer?.push(args);
     };
   }
-
-  window.gtag('consent', 'default', {
-    ad_storage: 'denied',
-    ad_user_data: 'denied',
-    ad_personalization: 'denied',
-    analytics_storage: hasForcedAnalyticsDebugConsent() ? 'granted' : 'denied',
-    wait_for_update: 500,
-  });
-  updateGoogleConsent(hasAnalyticsConsent());
 }
 
 function injectClarity() {
