@@ -5,6 +5,7 @@ const SESSION_STORAGE_KEY = 'myhumble_session_id';
 const CONSENT_STORAGE_KEY = 'myhumble_consent_preferences';
 export const APP_ROUTE_CHANGE_EVENT = 'myhumble:routechange';
 const DEFAULT_GA4_MEASUREMENT_ID = 'G-L1LPXCC1P9';
+const DEFAULT_CLARITY_PROJECT_ID = 'wlu4ohzqir';
 const FORCE_ANALYTICS_ALWAYS_ON = true;
 
 type AttributionData = {
@@ -38,7 +39,7 @@ function getGaId() {
 }
 
 function getClarityId() {
-  return import.meta.env.VITE_CLARITY_PROJECT_ID?.trim() || '';
+  return import.meta.env.VITE_CLARITY_PROJECT_ID?.trim() || DEFAULT_CLARITY_PROJECT_ID;
 }
 
 function isBrowser() {
