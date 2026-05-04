@@ -43,6 +43,10 @@ function isGaDebugMode() {
   return url.searchParams.get('ga_debug') === '1' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 }
 
+function hasForcedAnalyticsDebugConsent() {
+  return isGaDebugMode();
+}
+
 function getDefaultConsentPreferences(): ConsentPreferences {
   return {
     analytics: false,
@@ -92,17 +96,19 @@ export function hasConsentChoice() {
 }
 
 export function hasAnalyticsConsent() {
-  return getConsentPreferences().analytics;
+  return hasForcedAnalyticsDebugConsent() || getConsentPreferences().analytics;
 }
 
 function updateGoogleConsent(analyticsGranted: boolean) {
   if (!isBrowser() || !window.gtag) return;
 
+  const granted = analyticsGranted || hasForcedAnalyticsDebugConsent();
+
   window.gtag('consent', 'update', {
     ad_storage: 'denied',
     ad_user_data: 'denied',
     ad_personalization: 'denied',
-    analytics_storage: analyticsGranted ? 'granted' : 'denied',
+    analytics_storage: granted ? 'granted' : 'denied',
   });
 }
 
@@ -186,7 +192,7 @@ function injectGa() {
     ad_storage: 'denied',
     ad_user_data: 'denied',
     ad_personalization: 'denied',
-    analytics_storage: 'denied',
+    analytics_storage: hasForcedAnalyticsDebugConsent() ? 'granted' : 'denied',
     wait_for_update: 500,
   });
   updateGoogleConsent(hasAnalyticsConsent());
