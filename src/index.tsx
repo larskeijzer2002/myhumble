@@ -9,7 +9,7 @@ import { PrivacyOverlay } from './components/PrivacyOverlay';
 import { QuizModal } from './components/QuizModal';
 import { SectionHeader } from './components/SectionHeader';
 import { benefits, COMPANY_EMAIL, faqs, IMAGES, pillars, quizSteps, testimonials, WEB3FORMS_KEY, type PackageKey, type QuizAnswers, type TrainingFrequencyKey } from './data/siteContent';
-import { getConsentPreferences, hasConsentChoice, setConsentPreferences, trackEvent, trackPageView, triggerInitialAnalyticsHit, type ConsentPreferences } from './lib/tracking';
+import { APP_ROUTE_CHANGE_EVENT, getConsentPreferences, hasConsentChoice, setConsentPreferences, setVirtualRoute, trackEvent, trackPageView, triggerInitialAnalyticsHit, type ConsentPreferences } from './lib/tracking';
 import { cn, primaryButtonClass } from './lib/utils';
 
 function sanitizeText(value: string, maxLength = 200) {
@@ -33,6 +33,13 @@ function sanitizeSubmissionAnswers(answers: QuizAnswers): QuizAnswers {
     level: sanitizeText(answers.level, 120),
     commitment: sanitizeText(answers.commitment, 120),
   };
+}
+
+function getPackageKeyFromPath(pathname: string): PackageKey | null {
+  if (pathname === '/pakketten/my-humble-training') return 'training';
+  if (pathname === '/pakketten/my-humble-online') return 'online';
+  if (pathname === '/pakketten/my-humble-program') return 'program';
+  return null;
 }
 
 function Reveal({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
@@ -346,6 +353,7 @@ export default function SportLandingPage() {
   const [quizOpen, setQuizOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [startAtPackages, setStartAtPackages] = useState(false);
+  const [initialPackageKey, setInitialPackageKey] = useState<PackageKey | null>(null);
   const [consentOpen, setConsentOpen] = useState(false);
   const [consentManageOpen, setConsentManageOpen] = useState(false);
   const [consentPreferences, setConsentPreferencesState] = useState<ConsentPreferences>(() => getConsentPreferences());
@@ -375,21 +383,55 @@ export default function SportLandingPage() {
 
     handleRouteTracking();
     window.addEventListener('hashchange', handleRouteTracking);
-    return () => window.removeEventListener('hashchange', handleRouteTracking);
+    window.addEventListener('popstate', handleRouteTracking);
+    window.addEventListener(APP_ROUTE_CHANGE_EVENT, handleRouteTracking);
+    return () => {
+      window.removeEventListener('hashchange', handleRouteTracking);
+      window.removeEventListener('popstate', handleRouteTracking);
+      window.removeEventListener(APP_ROUTE_CHANGE_EVENT, handleRouteTracking);
+    };
   }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const packageFromPath = getPackageKeyFromPath(window.location.pathname);
+    const isPackagesPath = window.location.pathname === '/pakketten' || Boolean(packageFromPath);
+    const isIntakePath = window.location.pathname === '/intake';
+    const isPrivacyPath = window.location.pathname === '/privacy';
     const shouldOpenPackages =
       params.get('view') === 'pakketten' ||
       params.get('view') === 'packages' ||
       params.get('packages') === '1';
 
-    if (shouldOpenPackages) {
+    if (isPackagesPath || shouldOpenPackages) {
       setStartAtPackages(true);
+      setInitialPackageKey(packageFromPath);
       setQuizOpen(true);
+      return;
+    }
+
+    if (isIntakePath) {
+      setStartAtPackages(false);
+      setInitialPackageKey(null);
+      setQuizOpen(true);
+      return;
+    }
+
+    if (isPrivacyPath) {
+      setPrivacyOpen(true);
     }
   }, []);
+
+  useEffect(() => {
+    if (privacyOpen) {
+      setVirtualRoute('/privacy', { replace: true });
+      return;
+    }
+
+    if (!quizOpen) {
+      setVirtualRoute('/', { replace: true });
+    }
+  }, [privacyOpen, quizOpen]);
 
   useEffect(() => {
     if (quizOpen) {
@@ -629,12 +671,14 @@ export default function SportLandingPage() {
       <NavBar
         onOpenQuiz={() => {
           setStartAtPackages(false);
+          setInitialPackageKey(null);
           setQuizOpen(true);
         }}
       />
       <Hero
         onOpenQuiz={() => {
           setStartAtPackages(false);
+          setInitialPackageKey(null);
           setQuizOpen(true);
         }}
       />
@@ -644,6 +688,7 @@ export default function SportLandingPage() {
       <CtaSection
         onOpenQuiz={() => {
           setStartAtPackages(false);
+          setInitialPackageKey(null);
           setQuizOpen(true);
         }}
       />
@@ -652,6 +697,7 @@ export default function SportLandingPage() {
       <Footer
         onOpenQuiz={() => {
           setStartAtPackages(false);
+          setInitialPackageKey(null);
           setQuizOpen(true);
         }}
         onOpenPrivacy={() => setPrivacyOpen(true)}
@@ -663,9 +709,11 @@ export default function SportLandingPage() {
           <QuizModal
             isOpen={quizOpen}
             startAtPackages={startAtPackages}
+            initialPackageKey={initialPackageKey}
             onClose={() => {
               setQuizOpen(false);
               setStartAtPackages(false);
+              setInitialPackageKey(null);
             }}
             onSubmitLead={submitLead}
             onSelectPackage={goToStripe}

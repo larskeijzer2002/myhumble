@@ -2,7 +2,7 @@ import type { FormEvent, ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import type { PackageKey, PackagePlan, QuizAnswers, QuizStep, TrainingFrequencyKey } from '../data/siteContent';
 import { packages } from '../data/siteContent';
-import { trackEvent } from '../lib/tracking';
+import { setVirtualRoute, trackEvent } from '../lib/tracking';
 import { cn, ghostButtonClass, primaryButtonClass } from '../lib/utils';
 
 type SubmitStatus = {
@@ -19,6 +19,7 @@ type QuizModalProps = {
   isOpen: boolean;
   steps: QuizStep[];
   startAtPackages?: boolean;
+  initialPackageKey?: PackageKey | null;
   onClose: () => void;
   onSubmitLead: (answers: QuizAnswers) => Promise<boolean>;
   onSelectPackage: (
@@ -27,6 +28,12 @@ type QuizModalProps = {
     trainingFrequency?: TrainingFrequencyKey,
   ) => void | Promise<void>;
 };
+
+function getPackageSlug(packageKey: PackageKey) {
+  if (packageKey === 'training') return 'my-humble-training';
+  if (packageKey === 'online') return 'my-humble-online';
+  return 'my-humble-program';
+}
 
 type PackageOverviewProps = {
   activePackage: PackagePlan | null;
@@ -458,7 +465,15 @@ function isValidPhone(value: string) {
   return isDutchMobile || isDutchLandline;
 }
 
-export function QuizModal({ isOpen, steps, startAtPackages = false, onClose, onSubmitLead, onSelectPackage }: QuizModalProps) {
+export function QuizModal({
+  isOpen,
+  steps,
+  startAtPackages = false,
+  initialPackageKey = null,
+  onClose,
+  onSubmitLead,
+  onSelectPackage,
+}: QuizModalProps) {
   const [step, setStep] = useState(0);
   const [selectedPackage, setSelectedPackage] = useState<PackageKey | null>(null);
   const [answers, setAnswers] = useState<QuizAnswers>(initialAnswers);
@@ -470,17 +485,18 @@ export function QuizModal({ isOpen, steps, startAtPackages = false, onClose, onS
   useEffect(() => {
     if (!isOpen) {
       setStep(startAtPackages ? steps.length : 0);
-      setSelectedPackage(null);
+      setSelectedPackage(initialPackageKey);
       setSubmitStatus({ type: 'idle', message: '' });
       setAnswers(initialAnswers);
       setContactErrors({});
     }
-  }, [isOpen, startAtPackages, steps.length]);
+  }, [initialPackageKey, isOpen, startAtPackages, steps.length]);
 
   useEffect(() => {
     if (!isOpen) return;
     setStep(startAtPackages ? steps.length : 0);
-  }, [isOpen, startAtPackages, steps.length]);
+    setSelectedPackage(initialPackageKey);
+  }, [initialPackageKey, isOpen, startAtPackages, steps.length]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -503,6 +519,22 @@ export function QuizModal({ isOpen, steps, startAtPackages = false, onClose, onS
       }
     });
   }, [isOpen, activePackage]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (activePackage) {
+      setVirtualRoute(`/pakketten/${getPackageSlug(activePackage.key)}`, { replace: true });
+      return;
+    }
+
+    if (showPackages) {
+      setVirtualRoute('/pakketten', { replace: true });
+      return;
+    }
+
+    setVirtualRoute('/intake', { replace: true });
+  }, [activePackage, isOpen, showPackages]);
 
   if (!isOpen) {
     return null;

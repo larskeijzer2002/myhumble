@@ -1,6 +1,7 @@
 const ATTRIBUTION_STORAGE_KEY = 'myhumble_attribution';
 const SESSION_STORAGE_KEY = 'myhumble_session_id';
 const CONSENT_STORAGE_KEY = 'myhumble_consent_preferences';
+export const APP_ROUTE_CHANGE_EVENT = 'myhumble:routechange';
 const DEFAULT_GA4_MEASUREMENT_ID = 'G-L1LPXCC1P9';
 const FORCE_ANALYTICS_ALWAYS_ON = true;
 
@@ -26,6 +27,10 @@ export type ConsentPreferences = {
   updatedAt: string;
 };
 
+type VirtualRouteOptions = {
+  replace?: boolean;
+};
+
 function getGaId() {
   return import.meta.env.VITE_GA4_MEASUREMENT_ID?.trim() || DEFAULT_GA4_MEASUREMENT_ID;
 }
@@ -36,6 +41,11 @@ function getClarityId() {
 
 function isBrowser() {
   return typeof window !== 'undefined';
+}
+
+function normalizePath(path: string) {
+  if (!path) return '/';
+  return path.startsWith('/') ? path : `/${path}`;
 }
 
 function isGaDebugMode() {
@@ -98,6 +108,25 @@ export function hasConsentChoice() {
 
 export function hasAnalyticsConsent() {
   return hasForcedAnalyticsDebugConsent() || getConsentPreferences().analytics;
+}
+
+export function setVirtualRoute(path: string, options: VirtualRouteOptions = {}) {
+  if (!isBrowser()) return;
+
+  const nextPath = normalizePath(path);
+  const nextUrl = new URL(window.location.href);
+  nextUrl.pathname = nextPath;
+  nextUrl.search = '';
+  nextUrl.hash = '';
+
+  const currentRoute = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  const targetRoute = `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
+
+  if (currentRoute === targetRoute) return;
+
+  const historyMethod = options.replace ? 'replaceState' : 'pushState';
+  window.history[historyMethod]({ ...window.history.state, myhumbleVirtualRoute: nextPath }, '', nextUrl);
+  window.dispatchEvent(new Event(APP_ROUTE_CHANGE_EVENT));
 }
 
 function updateGoogleConsent(analyticsGranted: boolean) {
