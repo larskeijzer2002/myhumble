@@ -48,6 +48,10 @@ function normalizePath(path: string) {
   return path.startsWith('/') ? path : `/${path}`;
 }
 
+function normalizeClarityPageId(path: string) {
+  return normalizePath(path).replace(/[^\w/-]+/g, '-');
+}
+
 function isGaDebugMode() {
   if (!isBrowser()) return false;
   const url = new URL(window.location.href);
@@ -151,6 +155,20 @@ function updateClarityConsent(analyticsGranted: boolean) {
   });
 }
 
+export function syncClarityPageContext(pageName?: string) {
+  if (!isBrowser() || typeof window.clarity !== 'function') return;
+
+  const pagePath = `${window.location.pathname}${window.location.hash}`;
+  const pageId = normalizeClarityPageId(pagePath);
+  const sessionId = getSessionId();
+  const friendlyName = pageName || document.title || pagePath;
+
+  // Give Clarity explicit page/session context for SPA route changes.
+  window.clarity('identify', sessionId, sessionId, pageId, friendlyName);
+  window.clarity('set', 'page_path', pagePath);
+  window.clarity('set', 'page_title', friendlyName);
+}
+
 function sendGooglePageConfig(pageTitle?: string) {
   if (!isBrowser() || !window.gtag) return;
 
@@ -241,6 +259,7 @@ export function initTracking() {
   getSessionId();
   injectGa();
   updateClarityConsent(hasAnalyticsConsent());
+  syncClarityPageContext();
 }
 
 export function trackEvent(eventName: string, params: TrackParams = {}) {
