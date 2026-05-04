@@ -2,7 +2,7 @@ import type { FormEvent, ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import type { PackageKey, PackagePlan, QuizAnswers, QuizStep, TrainingFrequencyKey } from '../data/siteContent';
 import { packages } from '../data/siteContent';
-import { setVirtualRoute, trackEvent } from '../lib/tracking';
+import { setVirtualRoute, trackEvent, trackPageView } from '../lib/tracking';
 import { cn, ghostButtonClass, primaryButtonClass } from '../lib/utils';
 
 type SubmitStatus = {
@@ -33,6 +33,14 @@ function getPackageSlug(packageKey: PackageKey) {
   if (packageKey === 'training') return 'my-humble-training';
   if (packageKey === 'online') return 'my-humble-online';
   return 'my-humble-program';
+}
+
+function getQuizStepPath(stepKey: QuizStep['key']) {
+  if (stepKey === 'goal') return '/intake/doel';
+  if (stepKey === 'level') return '/intake/niveau';
+  if (stepKey === 'commitment') return '/intake/commitment';
+  if (stepKey === 'profile') return '/intake/profiel';
+  return '/intake/contactgegevens';
 }
 
 type PackageOverviewProps = {
@@ -533,8 +541,8 @@ export function QuizModal({
       return;
     }
 
-    setVirtualRoute('/intake', { replace: true });
-  }, [activePackage, isOpen, showPackages]);
+    setVirtualRoute(getQuizStepPath(currentStep?.key || 'goal'), { replace: true });
+  }, [activePackage, currentStep, isOpen, showPackages]);
 
   if (!isOpen) {
     return null;
@@ -551,6 +559,27 @@ export function QuizModal({
     : isProfileStep
       ? Boolean(answers.gender && answers.height && answers.weight)
       : Boolean(activeChoiceKey && answers[activeChoiceKey]);
+
+  function handleModalClose() {
+    trackEvent('quiz_closed', {
+      quiz_step: showPackages ? 'packages' : currentStep?.key || '',
+      quiz_step_index: step + 1,
+    });
+
+    if (currentStep?.key === 'details' && submitStatus.type !== 'success') {
+      setVirtualRoute('/intake/contact-afhaak');
+      trackPageView('Contactgegevens afgehaakt');
+      trackEvent('quiz_contact_details_abandoned', {
+        quiz_step: currentStep.key,
+        quiz_step_index: step + 1,
+        first_name_started: Boolean(answers.firstName.trim()),
+        email_started: Boolean(answers.email.trim()),
+        phone_started: Boolean(answers.phone.trim()),
+      });
+    }
+
+    onClose();
+  }
 
   function handleAnswer(key: keyof QuizAnswers, value: string) {
     setAnswers((prev) => ({ ...prev, [key]: value }));
@@ -599,7 +628,7 @@ export function QuizModal({
       >
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleModalClose}
           className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-lg text-white/70 transition hover:border-white hover:text-white"
         >
           ×
