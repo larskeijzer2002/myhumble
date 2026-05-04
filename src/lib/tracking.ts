@@ -6,7 +6,7 @@ const CONSENT_STORAGE_KEY = 'myhumble_consent_preferences';
 export const APP_ROUTE_CHANGE_EVENT = 'myhumble:routechange';
 const DEFAULT_GA4_MEASUREMENT_ID = 'G-L1LPXCC1P9';
 const DEFAULT_CLARITY_PROJECT_ID = 'wlu4ohzqir';
-const FORCE_ANALYTICS_ALWAYS_ON = true;
+const FORCE_ANALYTICS_ALWAYS_ON = false;
 
 type AttributionData = {
   first_visit_at?: string;
@@ -134,6 +134,10 @@ export function setVirtualRoute(path: string, options: VirtualRouteOptions = {})
 
 function updateGoogleConsent(analyticsGranted: boolean) {
   if (!isBrowser() || !window.gtag) return;
+
+  window.gtag('consent', 'update', {
+    analytics_storage: analyticsGranted ? 'granted' : 'denied',
+  });
 }
 
 function sendGooglePageConfig(pageTitle?: string) {
@@ -211,6 +215,10 @@ function injectGa() {
       window.dataLayer?.push(args);
     };
   }
+
+  window.gtag('consent', 'default', {
+    analytics_storage: hasAnalyticsConsent() ? 'granted' : 'denied',
+  });
 }
 
 function injectClarity() {
