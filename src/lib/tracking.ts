@@ -33,6 +33,8 @@ type VirtualRouteOptions = {
   replace?: boolean;
 };
 
+type ClarityConsentState = 'granted' | 'denied';
+
 function getGaId() {
   return import.meta.env.VITE_GA4_MEASUREMENT_ID?.trim() || DEFAULT_GA4_MEASUREMENT_ID;
 }
@@ -132,6 +134,20 @@ function updateGoogleConsent(analyticsGranted: boolean) {
 
   window.gtag('consent', 'update', {
     analytics_storage: analyticsGranted ? 'granted' : 'denied',
+    ad_storage: analyticsGranted ? 'granted' : 'denied',
+    ad_user_data: analyticsGranted ? 'granted' : 'denied',
+    ad_personalization: analyticsGranted ? 'granted' : 'denied',
+  });
+}
+
+function updateClarityConsent(analyticsGranted: boolean) {
+  if (!isBrowser() || typeof window.clarity !== 'function') return;
+
+  const consentState: ClarityConsentState = analyticsGranted ? 'granted' : 'denied';
+
+  window.clarity('consentv2', {
+    ad_Storage: consentState,
+    analytics_Storage: consentState,
   });
 }
 
@@ -160,6 +176,7 @@ export function setConsentPreferences(preferences: Pick<ConsentPreferences, 'ana
 
   window.localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(nextPreferences));
   updateGoogleConsent(nextPreferences.analytics);
+  updateClarityConsent(nextPreferences.analytics);
 
   if (nextPreferences.analytics) {
     sendGooglePageConfig();
@@ -212,6 +229,9 @@ function injectGa() {
 
   window.gtag('consent', 'default', {
     analytics_storage: hasAnalyticsConsent() ? 'granted' : 'denied',
+    ad_storage: hasAnalyticsConsent() ? 'granted' : 'denied',
+    ad_user_data: hasAnalyticsConsent() ? 'granted' : 'denied',
+    ad_personalization: hasAnalyticsConsent() ? 'granted' : 'denied',
   });
 }
 
@@ -220,6 +240,7 @@ export function initTracking() {
   captureAttribution();
   getSessionId();
   injectGa();
+  updateClarityConsent(hasAnalyticsConsent());
 }
 
 export function trackEvent(eventName: string, params: TrackParams = {}) {
