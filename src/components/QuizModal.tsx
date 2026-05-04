@@ -36,9 +36,7 @@ function getPackageSlug(packageKey: PackageKey) {
 }
 
 function getQuizStepPath(stepKey: QuizStep['key']) {
-  if (stepKey === 'goal') return '/intake/doel';
-  if (stepKey === 'level') return '/intake/niveau';
-  if (stepKey === 'commitment') return '/intake/commitment';
+  if (stepKey === 'details') return '/intake/contactgegevens';
   if (stepKey === 'profile') return '/intake/profiel';
   return '/intake/contactgegevens';
 }
@@ -541,7 +539,12 @@ export function QuizModal({
       return;
     }
 
-    setVirtualRoute(getQuizStepPath(currentStep?.key || 'goal'), { replace: true });
+    if (currentStep?.key === 'details') {
+      setVirtualRoute('/intake/contactgegevens', { replace: true });
+      return;
+    }
+
+    setVirtualRoute('/intake-gestart', { replace: true });
   }, [activePackage, currentStep, isOpen, showPackages]);
 
   if (!isOpen) {
@@ -611,6 +614,8 @@ export function QuizModal({
     setSubmitStatus({ type: 'loading', message: 'Aanvraag wordt verzonden...' });
     const ok = await onSubmitLead(answers);
     if (ok) {
+      setVirtualRoute('/intake/contact-ingevuld');
+      trackPageView('Contactgegevens ingevuld');
       trackEvent('quiz_submitted', { status: 'success' });
       setSubmitStatus({ type: 'success', message: 'Top. Kies nu jouw pakket hieronder.' });
       setStep(steps.length);

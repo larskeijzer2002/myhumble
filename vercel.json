@@ -8,6 +8,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/intake-gestart",
+      "destination": "/index.html"
+    },
+    {
       "source": "/intake/(.*)",
       "destination": "/index.html"
     },
