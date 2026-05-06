@@ -191,6 +191,15 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
           return;
         }
 
+        pushDataLayerEvent('myhumble_package_selected', {
+          package_name: activePackage.key,
+          package_slug: getPackageSlug(activePackage.key),
+          training_frequency: selectedTrainingFrequency,
+        });
+        trackEvent('package_selected', {
+          package_name: activePackage.key,
+          training_frequency: selectedTrainingFrequency,
+        });
         trackEvent('checkout_clicked', {
           package_name: activePackage.key,
           training_frequency: selectedTrainingFrequency,
@@ -199,6 +208,13 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
         return;
       }
 
+      pushDataLayerEvent('myhumble_package_selected', {
+        package_name: activePackage.key,
+        package_slug: getPackageSlug(activePackage.key),
+      });
+      trackEvent('package_selected', {
+        package_name: activePackage.key,
+      });
       trackEvent('checkout_clicked', {
         package_name: activePackage.key,
         training_frequency: selectedTrainingFrequency ?? '',
