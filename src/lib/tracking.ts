@@ -1,10 +1,7 @@
-import { track as trackVercelEvent } from '@vercel/analytics';
-
 const ATTRIBUTION_STORAGE_KEY = 'myhumble_attribution';
 const SESSION_STORAGE_KEY = 'myhumble_session_id';
 const CONSENT_STORAGE_KEY = 'myhumble_consent_preferences';
 export const APP_ROUTE_CHANGE_EVENT = 'myhumble:routechange';
-const DEFAULT_GA4_MEASUREMENT_ID = 'G-L1LPXCC1P9';
 const FORCE_ANALYTICS_ALWAYS_ON = false;
 
 type AttributionData = {
@@ -34,10 +31,6 @@ type VirtualRouteOptions = {
 };
 
 type ClarityConsentState = 'granted' | 'denied';
-
-function getGaId() {
-  return import.meta.env.VITE_GA4_MEASUREMENT_ID?.trim() || DEFAULT_GA4_MEASUREMENT_ID;
-}
 
 function isBrowser() {
   return typeof window !== 'undefined';
@@ -139,17 +132,6 @@ export function setVirtualRoute(path: string, options: VirtualRouteOptions = {})
   window.dispatchEvent(new Event(APP_ROUTE_CHANGE_EVENT));
 }
 
-function updateGoogleConsent(analyticsGranted: boolean) {
-  if (!isBrowser() || !window.gtag) return;
-
-  window.gtag('consent', 'update', {
-    analytics_storage: analyticsGranted ? 'granted' : 'denied',
-    ad_storage: analyticsGranted ? 'granted' : 'denied',
-    ad_user_data: analyticsGranted ? 'granted' : 'denied',
-    ad_personalization: analyticsGranted ? 'granted' : 'denied',
-  });
-}
-
 function updateClarityConsent(analyticsGranted: boolean) {
   if (!isBrowser() || typeof window.clarity !== 'function') return;
 
@@ -175,21 +157,6 @@ export function syncClarityPageContext(pageName?: string) {
   window.clarity('set', 'page_title', friendlyName);
 }
 
-function sendGooglePageConfig(pageTitle?: string) {
-  if (!isBrowser() || !window.gtag) return;
-
-  const gaId = getGaId();
-  if (!gaId) return;
-
-  window.gtag('config', gaId, {
-    page_title: pageTitle || document.title,
-    page_path: `${window.location.pathname}${window.location.search}${window.location.hash}`,
-    page_location: window.location.href,
-    send_page_view: false,
-    debug_mode: isGaDebugMode(),
-  });
-}
-
 export function setConsentPreferences(preferences: Pick<ConsentPreferences, 'analytics'>) {
   if (!isBrowser()) return;
 
@@ -199,12 +166,7 @@ export function setConsentPreferences(preferences: Pick<ConsentPreferences, 'ana
   };
 
   window.localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(nextPreferences));
-  updateGoogleConsent(nextPreferences.analytics);
   updateClarityConsent(nextPreferences.analytics);
-
-  if (nextPreferences.analytics) {
-    sendGooglePageConfig();
-  }
 }
 
 export function captureAttribution() {
@@ -240,30 +202,10 @@ export function captureAttribution() {
   return merged;
 }
 
-function injectGa() {
-  const gaId = getGaId();
-  if (!gaId || !isBrowser()) return;
-
-  window.dataLayer = window.dataLayer || [];
-  if (!window.gtag) {
-    window.gtag = function gtag(...args: unknown[]) {
-      window.dataLayer?.push(args);
-    };
-  }
-
-  window.gtag('consent', 'default', {
-    analytics_storage: hasAnalyticsConsent() ? 'granted' : 'denied',
-    ad_storage: hasAnalyticsConsent() ? 'granted' : 'denied',
-    ad_user_data: hasAnalyticsConsent() ? 'granted' : 'denied',
-    ad_personalization: hasAnalyticsConsent() ? 'granted' : 'denied',
-  });
-}
-
 export function initTracking() {
   if (!isBrowser()) return;
   captureAttribution();
   getSessionId();
-  injectGa();
   updateClarityConsent(hasAnalyticsConsent());
   syncClarityPageContext();
 }
@@ -296,15 +238,7 @@ export function trackEvent(eventName: string, params: TrackParams = {}) {
     }).filter(([, value]) => value !== undefined && value !== ''),
   );
 
-  if (window.gtag) {
-    window.gtag('event', eventName, cleanParams);
-  }
-
-  try {
-    trackVercelEvent(eventName, cleanParams);
-  } catch {
-    // Ignore Vercel Analytics client errors so user flows are never blocked.
-  }
+  pushDataLayerEvent(eventName, cleanParams);
 }
 
 export function trackPageView(pageName?: string) {
@@ -313,18 +247,12 @@ export function trackPageView(pageName?: string) {
   const pagePath = `${window.location.pathname}${window.location.hash}`;
   const pageTitle = pageName || document.title;
 
-  sendGooglePageConfig(pageTitle);
-
-  if (window.gtag) {
-    window.gtag('event', 'page_view', {
-      page_title: pageTitle,
-      page_path: pagePath,
-      page_location: window.location.href,
-      session_id: getSessionId(),
-      debug_mode: isGaDebugMode(),
-      ...getStoredAttribution(),
-    });
-  }
+  pushDataLayerEvent('myhumble_virtual_page_view', {
+    page_title: pageTitle,
+    page_path: pagePath,
+    debug_mode: isGaDebugMode(),
+    ...getStoredAttribution(),
+  });
 }
 
 export function triggerInitialAnalyticsHit(pageName?: string) {
@@ -334,25 +262,17 @@ export function triggerInitialAnalyticsHit(pageName?: string) {
     if (!hasAnalyticsConsent()) return;
 
     const pageTitle = pageName || document.title;
-    sendGooglePageConfig(pageTitle);
-
-    if (window.gtag) {
-      window.gtag('event', 'page_view', {
-        page_title: pageTitle,
-        page_path: `${window.location.pathname}${window.location.hash}`,
-        page_location: window.location.href,
-        session_id: getSessionId(),
-        debug_mode: isGaDebugMode(),
-        ...getStoredAttribution(),
-      });
-
-      window.gtag('event', 'analytics_test_hit', {
-        source: 'consent_accept',
-        session_id: getSessionId(),
-        debug_mode: isGaDebugMode(),
-        ...getStoredAttribution(),
-      });
-    }
+    pushDataLayerEvent('myhumble_virtual_page_view', {
+      page_title: pageTitle,
+      page_path: `${window.location.pathname}${window.location.hash}`,
+      debug_mode: isGaDebugMode(),
+      ...getStoredAttribution(),
+    });
+    pushDataLayerEvent('myhumble_analytics_test_hit', {
+      source: 'consent_accept',
+      debug_mode: isGaDebugMode(),
+      ...getStoredAttribution(),
+    });
   }, 800);
 }
 
