@@ -2,7 +2,7 @@ import type { FormEvent, ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import type { PackageKey, PackagePlan, QuizAnswers, QuizStep, TrainingFrequencyKey } from '../data/siteContent';
 import { packages } from '../data/siteContent';
-import { setVirtualRoute, trackEvent, trackPageView } from '../lib/tracking';
+import { pushDataLayerEvent, setVirtualRoute, trackEvent, trackPageView } from '../lib/tracking';
 import { cn, ghostButtonClass, primaryButtonClass } from '../lib/utils';
 
 type SubmitStatus = {
@@ -39,6 +39,15 @@ function getQuizStepPath(stepKey: QuizStep['key']) {
   if (stepKey === 'details') return '/intake/contactgegevens';
   if (stepKey === 'profile') return '/intake/profiel';
   return '/intake/contactgegevens';
+}
+
+function getQuizStepLabel(stepKey: QuizStep['key']) {
+  if (stepKey === 'goal') return 'doel';
+  if (stepKey === 'level') return 'niveau';
+  if (stepKey === 'commitment') return 'commitment';
+  if (stepKey === 'profile') return 'profiel';
+  if (stepKey === 'details') return 'contactgegevens';
+  return stepKey;
 }
 
 type PackageOverviewProps = {
@@ -158,7 +167,16 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
   useEffect(() => {
     if (activePackage) {
       trackEvent('package_viewed', { package_name: activePackage.key });
+      pushDataLayerEvent('myhumble_package_detail_view', {
+        package_name: activePackage.key,
+        package_slug: getPackageSlug(activePackage.key),
+      });
+      return;
     }
+
+    pushDataLayerEvent('myhumble_packages_overview_view', {
+      packages_total: packages.length,
+    });
   }, [activePackage]);
 
   if (activePackage) {
@@ -287,11 +305,15 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
                         onClick={() => {
                           setSelectedTrainingFrequency(option.key);
                           setTrainingSelectionError('');
-                          trackEvent('training_frequency_selected', {
-                            package_name: activePackage.key,
-                            training_frequency: option.key,
-                          });
-                        }}
+                        trackEvent('training_frequency_selected', {
+                          package_name: activePackage.key,
+                          training_frequency: option.key,
+                        });
+                        pushDataLayerEvent('myhumble_training_frequency_selected', {
+                          package_name: activePackage.key,
+                          training_frequency: option.key,
+                        });
+                      }}
                         className={cn(
                           'rounded-[1.2rem] border px-4 py-4 text-left transition',
                           selectedTrainingFrequency === option.key
@@ -384,7 +406,13 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
         <button
           key={pkg.key}
           type="button"
-          onClick={() => onOpenPackage(pkg.key)}
+          onClick={() => {
+            pushDataLayerEvent('myhumble_package_card_clicked', {
+              package_name: pkg.key,
+              package_slug: getPackageSlug(pkg.key),
+            });
+            onOpenPackage(pkg.key);
+          }}
           className="block w-full overflow-hidden rounded-[1.75rem] border border-white/10 bg-black/60 text-left transition hover:border-[#2872fa]"
         >
           <div className="relative">
@@ -402,7 +430,17 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
           <div className="p-7">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <button type="button" onClick={() => onOpenPackage(pkg.key)} className="text-left transition hover:opacity-85">
+                <button
+                  type="button"
+                  onClick={() => {
+                    pushDataLayerEvent('myhumble_package_card_clicked', {
+                      package_name: pkg.key,
+                      package_slug: getPackageSlug(pkg.key),
+                    });
+                    onOpenPackage(pkg.key);
+                  }}
+                  className="text-left transition hover:opacity-85"
+                >
                   <h3 className="text-2xl font-black uppercase">{pkg.title}</h3>
                 </button>
                 <p className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-white/45">{pkg.tag}</p>
@@ -413,6 +451,10 @@ function PackageOverview({ activePackage, onBack, onSelectPackage, onOpenPackage
                 onClick={(event) => {
                   event.stopPropagation();
                   trackEvent('package_selected', { package_name: pkg.key });
+                  pushDataLayerEvent('myhumble_package_selected', {
+                    package_name: pkg.key,
+                    package_slug: getPackageSlug(pkg.key),
+                  });
                   if (pkg.key === 'training') {
                     onOpenPackage(pkg.key);
                     return;
@@ -507,11 +549,27 @@ export function QuizModal({
   useEffect(() => {
     if (!isOpen) return;
 
+    pushDataLayerEvent('myhumble_quiz_step_view', {
+      quiz_step_key: showPackages ? 'packages' : currentStep?.key || '',
+      quiz_step_label: showPackages ? 'pakketten' : getQuizStepLabel(currentStep?.key || 'goal'),
+      quiz_step_index: step + 1,
+      quiz_phase: showPackages ? 'pakketten' : 'intake',
+    });
+
     trackEvent('quiz_step_viewed', {
       quiz_step: showPackages ? 'packages' : currentStep?.key || '',
       quiz_step_index: step + 1,
     });
   }, [isOpen, step, showPackages, currentStep]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    pushDataLayerEvent('myhumble_quiz_open', {
+      start_at_packages: startAtPackages,
+      initial_package: initialPackageKey ?? '',
+    });
+  }, [initialPackageKey, isOpen, startAtPackages]);
 
   const activePackage = useMemo(() => packages.find((pkg) => pkg.key === selectedPackage) || null, [selectedPackage]);
 
@@ -564,6 +622,13 @@ export function QuizModal({
       : Boolean(activeChoiceKey && answers[activeChoiceKey]);
 
   function handleModalClose() {
+    pushDataLayerEvent('myhumble_quiz_closed', {
+      quiz_step_key: showPackages ? 'packages' : currentStep?.key || '',
+      quiz_step_label: showPackages ? 'pakketten' : getQuizStepLabel(currentStep?.key || 'goal'),
+      quiz_step_index: step + 1,
+      quiz_phase: showPackages ? 'pakketten' : 'intake',
+    });
+
     trackEvent('quiz_closed', {
       quiz_step: showPackages ? 'packages' : currentStep?.key || '',
       quiz_step_index: step + 1,
@@ -572,6 +637,14 @@ export function QuizModal({
     if (currentStep?.key === 'details' && submitStatus.type !== 'success') {
       setVirtualRoute('/intake/contact-afhaak');
       trackPageView('Contactgegevens afgehaakt');
+      pushDataLayerEvent('myhumble_contact_details_abandoned', {
+        quiz_step_key: currentStep.key,
+        quiz_step_label: getQuizStepLabel(currentStep.key),
+        quiz_step_index: step + 1,
+        first_name_started: Boolean(answers.firstName.trim()),
+        email_started: Boolean(answers.email.trim()),
+        phone_started: Boolean(answers.phone.trim()),
+      });
       trackEvent('quiz_contact_details_abandoned', {
         quiz_step: currentStep.key,
         quiz_step_index: step + 1,
@@ -586,6 +659,13 @@ export function QuizModal({
 
   function handleAnswer(key: keyof QuizAnswers, value: string) {
     setAnswers((prev) => ({ ...prev, [key]: value }));
+    pushDataLayerEvent('myhumble_quiz_answer_selected', {
+      answer_key: key,
+      answer_value: value,
+      quiz_step_key: currentStep?.key || '',
+      quiz_step_label: currentStep ? getQuizStepLabel(currentStep.key) : '',
+      quiz_step_index: step + 1,
+    });
     trackEvent('quiz_answer_selected', { answer_key: key, answer_value: value });
 
     if (key === 'email' || key === 'phone') {
@@ -607,6 +687,12 @@ export function QuizModal({
 
     if (Object.keys(nextErrors).length > 0) {
       setContactErrors(nextErrors);
+      pushDataLayerEvent('myhumble_contact_details_validation_failed', {
+        quiz_step_key: currentStep?.key || '',
+        quiz_step_label: currentStep ? getQuizStepLabel(currentStep.key) : '',
+        email_invalid: Boolean(nextErrors.email),
+        phone_invalid: Boolean(nextErrors.phone),
+      });
       return;
     }
 
@@ -616,10 +702,20 @@ export function QuizModal({
     if (ok) {
       setVirtualRoute('/intake/contact-ingevuld');
       trackPageView('Contactgegevens ingevuld');
+      pushDataLayerEvent('myhumble_contact_details_submitted', {
+        quiz_step_key: currentStep?.key || '',
+        quiz_step_label: currentStep ? getQuizStepLabel(currentStep.key) : 'contactgegevens',
+        quiz_step_index: step + 1,
+      });
       trackEvent('quiz_submitted', { status: 'success' });
       setSubmitStatus({ type: 'success', message: 'Top. Kies nu jouw pakket hieronder.' });
       setStep(steps.length);
     } else {
+      pushDataLayerEvent('myhumble_contact_details_submit_failed', {
+        quiz_step_key: currentStep?.key || '',
+        quiz_step_label: currentStep ? getQuizStepLabel(currentStep.key) : 'contactgegevens',
+        quiz_step_index: step + 1,
+      });
       trackEvent('quiz_submitted', { status: 'error' });
       setSubmitStatus({ type: 'error', message: 'Er ging iets mis met het verzenden van de aanvraag.' });
     }
@@ -811,12 +907,28 @@ export function QuizModal({
         {!showPackages ? (
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             {step > 0 ? (
-              <button type="button" onClick={() => setStep((current) => current - 1)} className={ghostButtonClass}>
+              <button
+                type="button"
+                onClick={() => setStep((current) => current - 1)}
+                className={ghostButtonClass}
+              >
                 Terug
               </button>
             ) : null}
             {step < steps.length - 1 ? (
-              <button type="button" className={cn(primaryButtonClass, 'flex-1')} onClick={() => canContinue && setStep((current) => current + 1)}>
+              <button
+                type="button"
+                className={cn(primaryButtonClass, 'flex-1')}
+                onClick={() => {
+                  if (!canContinue) return;
+                  pushDataLayerEvent('myhumble_quiz_step_completed', {
+                    quiz_step_key: currentStep?.key || '',
+                    quiz_step_label: currentStep ? getQuizStepLabel(currentStep.key) : '',
+                    quiz_step_index: step + 1,
+                  });
+                  setStep((current) => current + 1);
+                }}
+              >
                 Volgende stap
               </button>
             ) : null}

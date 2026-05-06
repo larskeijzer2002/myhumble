@@ -43,6 +43,12 @@ function isBrowser() {
   return typeof window !== 'undefined';
 }
 
+function ensureDataLayer() {
+  if (!isBrowser()) return [];
+  window.dataLayer = window.dataLayer || [];
+  return window.dataLayer;
+}
+
 function normalizePath(path: string) {
   if (!path) return '/';
   return path.startsWith('/') ? path : `/${path}`;
@@ -260,6 +266,22 @@ export function initTracking() {
   injectGa();
   updateClarityConsent(hasAnalyticsConsent());
   syncClarityPageContext();
+}
+
+export function pushDataLayerEvent(eventName: string, params: TrackParams = {}) {
+  if (!isBrowser()) return;
+
+  const payload = Object.fromEntries(
+    Object.entries({
+      event: eventName,
+      session_id: getSessionId(),
+      page_path: `${window.location.pathname}${window.location.hash}`,
+      page_location: window.location.href,
+      ...params,
+    }).filter(([, value]) => value !== undefined && value !== ''),
+  );
+
+  ensureDataLayer().push(payload);
 }
 
 export function trackEvent(eventName: string, params: TrackParams = {}) {
