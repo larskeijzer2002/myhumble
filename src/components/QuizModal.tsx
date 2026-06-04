@@ -867,46 +867,76 @@ export function QuizModal({
             ))}
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <input
-              type="text"
-              placeholder="Naam"
-              value={answers.firstName}
-              onChange={(event) => handleAnswer('firstName', event.target.value)}
-              className="w-full rounded-2xl border border-white/10 bg-black/70 px-5 py-4 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#2872fa]"
-            />
-            <div>
-              <input
-                type="email"
-                inputMode="email"
-                placeholder="Email"
-                value={answers.email}
-                onChange={(event) => handleAnswer('email', event.target.value)}
-                className={cn(
-                  'w-full rounded-2xl border bg-black/70 px-5 py-4 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#2872fa]',
-                  contactErrors.email ? 'border-red-500/60' : 'border-white/10',
-                )}
-              />
-              {contactErrors.email ? <p className="mt-2 text-sm text-red-300">{contactErrors.email}</p> : null}
+          <div className="space-y-5">
+            <div className="rounded-[1.5rem] border border-[#2872fa]/20 bg-[#2872fa]/10 p-5">
+              <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#2872fa]">
+                Bijna klaar
+              </p>
+              <h3 className="mt-3 text-xl font-black uppercase leading-tight text-white">
+                We gebruiken je gegevens alleen om jouw intake persoonlijk op te volgen.
+              </h3>
+              <p className="mt-3 text-sm leading-7 text-white/72">
+                Je zit nog nergens direct aan vast. Na je intake kijken we eerst rustig mee naar jouw antwoorden en nemen
+                we persoonlijk contact met je op om te kijken welk traject echt bij je past.
+              </p>
             </div>
-            <div>
-              <input
-                type="tel"
-                inputMode="tel"
-                placeholder="Telefoon"
-                value={answers.phone}
-                onChange={(event) => handleAnswer('phone', event.target.value)}
-                className={cn(
-                  'w-full rounded-2xl border bg-black/70 px-5 py-4 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#2872fa]',
-                  contactErrors.phone ? 'border-red-500/60' : 'border-white/10',
-                )}
-              />
-              {contactErrors.phone ? <p className="mt-2 text-sm text-red-300">{contactErrors.phone}</p> : null}
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              {[
+                '1. We bekijken je intake',
+                '2. We nemen persoonlijk contact op',
+                '3. We adviseren wat bij je past',
+              ].map((item) => (
+                <div key={item} className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 text-sm font-semibold text-white/75">
+                  {item}
+                </div>
+              ))}
             </div>
-            <button type="submit" className={cn(primaryButtonClass, 'w-full')} disabled={!canContinue || submitStatus.type === 'loading'}>
-              {submitStatus.type === 'loading' ? 'Bezig met verzenden...' : 'Verstuur en kies pakket'}
-            </button>
-          </form>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <input
+                type="text"
+                placeholder="Voornaam"
+                value={answers.firstName}
+                onChange={(event) => handleAnswer('firstName', event.target.value)}
+                className="w-full rounded-2xl border border-white/10 bg-black/70 px-5 py-4 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#2872fa]"
+              />
+              <div>
+                <input
+                  type="email"
+                  inputMode="email"
+                  placeholder="E-mailadres"
+                  value={answers.email}
+                  onChange={(event) => handleAnswer('email', event.target.value)}
+                  className={cn(
+                    'w-full rounded-2xl border bg-black/70 px-5 py-4 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#2872fa]',
+                    contactErrors.email ? 'border-red-500/60' : 'border-white/10',
+                  )}
+                />
+                {contactErrors.email ? <p className="mt-2 text-sm text-red-300">{contactErrors.email}</p> : null}
+              </div>
+              <div>
+                <input
+                  type="tel"
+                  inputMode="tel"
+                  placeholder="Telefoonnummer"
+                  value={answers.phone}
+                  onChange={(event) => handleAnswer('phone', event.target.value)}
+                  className={cn(
+                    'w-full rounded-2xl border bg-black/70 px-5 py-4 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#2872fa]',
+                    contactErrors.phone ? 'border-red-500/60' : 'border-white/10',
+                  )}
+                />
+                {contactErrors.phone ? <p className="mt-2 text-sm text-red-300">{contactErrors.phone}</p> : null}
+              </div>
+              <button type="submit" className={cn(primaryButtonClass, 'w-full')} disabled={!canContinue || submitStatus.type === 'loading'}>
+                {submitStatus.type === 'loading' ? 'Bezig met verzenden...' : 'Verstuur intake en bekijk pakketten'}
+              </button>
+              <p className="text-center text-xs leading-6 text-white/45">
+                Je gegevens worden alleen gebruikt om contact met je op te nemen over jouw intake.
+              </p>
+            </form>
+          </div>
         )}
 
         {submitStatus.type !== 'idle' ? (

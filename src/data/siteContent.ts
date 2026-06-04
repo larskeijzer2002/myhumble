@@ -222,8 +222,8 @@ export const quizSteps: QuizStep[] = [
   },
   {
     key: 'details',
-    eyebrow: 'Laatste stap',
-    title: 'Laat je gegevens achter en zet jouw volgende stap.',
+    eyebrow: 'Persoonlijke intake',
+    title: 'Laat je gegevens achter, dan kijken we persoonlijk met je mee.',
     options: [],
   },
 ];
