@@ -58,7 +58,7 @@ function isGaDebugMode() {
 }
 
 function hasForcedAnalyticsDebugConsent() {
-  return FORCE_ANALYTICS_ALWAYS_ON || isGaDebugMode();
+  return FORCE_ANALYTICS_ALWAYS_ON;
 }
 
 function getDefaultConsentPreferences(): ConsentPreferences {
@@ -138,8 +138,19 @@ function updateClarityConsent(analyticsGranted: boolean) {
   const consentState: ClarityConsentState = analyticsGranted ? 'granted' : 'denied';
 
   window.clarity('consentv2', {
-    ad_Storage: consentState,
+    ad_Storage: 'denied',
     analytics_Storage: consentState,
+  });
+}
+
+function updateGoogleConsent(analyticsGranted: boolean) {
+  if (!isBrowser() || typeof window.gtag !== 'function') return;
+
+  window.gtag('consent', 'update', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: analyticsGranted ? 'granted' : 'denied',
   });
 }
 
@@ -166,6 +177,7 @@ export function setConsentPreferences(preferences: Pick<ConsentPreferences, 'ana
   };
 
   window.localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(nextPreferences));
+  updateGoogleConsent(nextPreferences.analytics);
   updateClarityConsent(nextPreferences.analytics);
 }
 
@@ -206,7 +218,9 @@ export function initTracking() {
   if (!isBrowser()) return;
   captureAttribution();
   getSessionId();
-  updateClarityConsent(hasAnalyticsConsent());
+  const analyticsGranted = hasAnalyticsConsent();
+  updateGoogleConsent(analyticsGranted);
+  updateClarityConsent(analyticsGranted);
   syncClarityPageContext();
 }
 
@@ -274,25 +288,4 @@ export function triggerInitialAnalyticsHit(pageName?: string) {
       ...getStoredAttribution(),
     });
   }, 800);
-}
-
-export function buildTrackedStripeUrl(url: string, params: TrackParams = {}) {
-  const trackedUrl = new URL(url);
-  const attribution = getStoredAttribution();
-
-  Object.entries(attribution).forEach(([key, value]) => {
-    if (value && key.startsWith('utm_')) {
-      trackedUrl.searchParams.set(key, value);
-    }
-  });
-
-  trackedUrl.searchParams.set('client_reference_id', getSessionId());
-
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== '') {
-      trackedUrl.searchParams.set(key, String(value));
-    }
-  });
-
-  return trackedUrl.toString();
 }

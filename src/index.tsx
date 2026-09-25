@@ -537,7 +537,6 @@ export default function SportLandingPage() {
           email: safeAnswers.email,
           phone: safeAnswers.phone,
           email_to: COMPANY_EMAIL,
-          botcheck: '',
           message:
             `Nieuwe aanvraag voor My Humble.\n\n` +
             `Naam: ${safeAnswers.firstName}\n` +
@@ -560,7 +559,7 @@ export default function SportLandingPage() {
     }
   }
 
-  async function goToStripe(packageKey: PackageKey, answers: QuizAnswers, trainingFrequency?: TrainingFrequencyKey) {
+  async function submitPackageRequest(packageKey: PackageKey, answers: QuizAnswers, trainingFrequency?: TrainingFrequencyKey) {
     const safeAnswers = sanitizeSubmissionAnswers(answers);
 
     if (!safeAnswers.firstName || !safeAnswers.email || !safeAnswers.phone) {
@@ -604,7 +603,6 @@ export default function SportLandingPage() {
           email_to: COMPANY_EMAIL,
           package_name: packageLabel,
           training_frequency: frequencyLabel,
-          botcheck: '',
           message:
             `PAKKETGEKOZEN\n` +
             `====================\n` +
@@ -717,7 +715,7 @@ export default function SportLandingPage() {
               setInitialPackageKey(null);
             }}
             onSubmitLead={submitLead}
-            onSelectPackage={goToStripe}
+            onSelectPackage={submitPackageRequest}
             steps={quizSteps}
           />
         ) : null}

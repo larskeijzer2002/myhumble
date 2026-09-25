@@ -1,17 +1,6 @@
 export const WEB3FORMS_KEY = '8bc1da31-f069-480a-9197-408c6464efab';
 export const COMPANY_EMAIL = 'info@myhumble.nl';
 
-export const STRIPE_LINKS = {
-  online: 'https://buy.stripe.com/14A00j9dgeKoa5V7cr8EM05',
-  program: 'https://buy.stripe.com/REPLACE_PROGRAM_LINK',
-} as const;
-
-export const TRAINING_STRIPE_LINKS = {
-  once: 'https://buy.stripe.com/3cIdR91KO1XC1zpcwL8EM02',
-  twice: 'https://buy.stripe.com/bJe8wPgFI45KembdAP8EM03',
-  threePlus: 'https://buy.stripe.com/14AcN5exAgSwdi7bsH8EM04',
-} as const;
-
 export const LOGO_SRC = '/assets/my-humble-logo.jpg';
 
 export const IMAGES = {
@@ -55,8 +44,8 @@ export type QuizStep = {
   options: string[];
 };
 
-export type PackageKey = 'training' | keyof typeof STRIPE_LINKS;
-export type TrainingFrequencyKey = keyof typeof TRAINING_STRIPE_LINKS;
+export type PackageKey = 'training' | 'online' | 'program';
+export type TrainingFrequencyKey = 'once' | 'twice' | 'threePlus';
 
 export type TrainingFrequencyOption = {
   key: TrainingFrequencyKey;

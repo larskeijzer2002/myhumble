@@ -38,26 +38,25 @@ Dubbelklik op dit bestand in Finder. Dan gebeurt automatisch:
 4. Controleer de build-instellingen:
    - Build command: `pnpm build`
    - Output directory: `dist`
-5. Voeg environment variables toe in Vercel:
-   - `VITE_GA4_MEASUREMENT_ID`
-   - `VITE_CLARITY_PROJECT_ID`
-6. Deploy het project.
+5. Deploy het project.
 
 ## Inzicht in gebruik
 
-De site ondersteunt al:
+De site ondersteunt:
 
-- Google Analytics 4
-- Microsoft Clarity
+- Google Tag Manager `GTM-W5C7LXT8`, met GA4 via de GTM-container
+- Microsoft Clarity-project `wlu4ohzqir`
 - UTM-tracking
-- event-tracking op quiz, pakketten en checkout
+- event-tracking op quiz, pakketten en contactaanvragen
+- Google Consent Mode en Clarity ConsentV2 via dezelfde cookiebanner
 
-Maak lokaal een `.env.local` aan met:
+Er zijn voor deze integraties geen client-side environment variables nodig. De publieke
+container- en project-ID's staan bewust in `index.html`; geheime waarden horen nooit in
+een `VITE_`-variabele.
 
-```env
-VITE_GA4_MEASUREMENT_ID=G-XXXXXXX
-VITE_CLARITY_PROJECT_ID=XXXXXXXXXX
-```
+De toestemmingsstatus wordt vóór GTM en Clarity ingesteld door
+`public/consent-default.js`. Pas de volgorde van deze scripts niet aan: de
+toestemmingsinitialisatie moet als eerste worden uitgevoerd.
 
 Gebruik voor campagnes links zoals:
 
